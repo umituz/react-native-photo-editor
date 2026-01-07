@@ -19,13 +19,19 @@ import { TextEditorSheet } from "./components/TextEditorSheet";
 import { createEditorStyles } from "./styles";
 import { usePhotoEditorUI } from "./hooks/usePhotoEditorUI";
 
+export interface EditorActions {
+  addTextLayer: (tokens: any) => string;
+  updateLayer: (id: string, updates: any) => void;
+  getLayers: () => any[];
+  getActiveLayerId: () => string | null;
+}
+
 export interface PhotoEditorProps {
   imageUri: string;
   onSave?: (uri: string) => void;
   onClose: () => void;
   title?: string;
-  onShare?: () => void;
-  customTools?: React.ReactNode;
+  customTools?: React.ReactNode | ((actions: EditorActions) => React.ReactNode);
   initialCaption?: string;
   t: (key: string) => string;
 }
@@ -98,7 +104,14 @@ export const PhotoEditor: React.FC<PhotoEditorProps> = ({
             onLayerMove={(id, x, y) => updateLayer(id, { x, y })}
             styles={styles}
           />
-          {customTools}
+          {typeof customTools === "function"
+            ? customTools({
+                addTextLayer,
+                updateLayer,
+                getLayers: () => layers,
+                getActiveLayerId: () => activeLayerId,
+              })
+            : customTools}
           <FontControls
             fontSize={fontSize}
             selectedFont={selectedFont}
