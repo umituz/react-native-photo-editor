@@ -116,6 +116,7 @@ export const usePhotoEditorUI = (
     updateLayer,
     deleteLayer,
     selectLayer,
+    addTextLayer,
     // UI Actions
     handleAddText,
     handleTextLayerTap,

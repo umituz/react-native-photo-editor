@@ -10,7 +10,7 @@ import {
   AtomicText,
   useAppDesignTokens,
 } from "@umituz/react-native-design-system";
-import { TextAlign } from "../../domain/Editor.types";
+import { TextAlign } from "../types";
 
 interface DraggableTextProps {
   text: string;

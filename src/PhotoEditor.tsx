@@ -72,6 +72,7 @@ export const PhotoEditor: React.FC<PhotoEditorProps> = ({
     updateLayer,
     deleteLayer,
     selectLayer,
+    addTextLayer,
     handleAddText,
     handleTextLayerTap,
     handleSaveText,
