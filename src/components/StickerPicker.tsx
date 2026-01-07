@@ -4,48 +4,16 @@ import {
   AtomicText,
   useAppDesignTokens,
 } from "@umituz/react-native-design-system";
-
-const STICKERS = [
-  "😀",
-  "😂",
-  "🤣",
-  "😍",
-  "🥰",
-  "😎",
-  "🤯",
-  "🥳",
-  "😤",
-  "💀",
-  "🔥",
-  "❤️",
-  "💯",
-  "✨",
-  "🎉",
-  "🤡",
-  "👀",
-  "🙌",
-  "👏",
-  "💪",
-  "🤝",
-  "🙈",
-  "🐶",
-  "🐱",
-  "🦊",
-  "🐸",
-  "🌟",
-  "⭐",
-  "🌈",
-  "☀️",
-  "🌙",
-  "💫",
-];
+import { DEFAULT_STICKERS } from "../constants";
 
 interface StickerPickerProps {
   onSelectSticker: (sticker: string) => void;
+  stickers?: readonly string[];
 }
 
 export const StickerPicker: React.FC<StickerPickerProps> = ({
   onSelectSticker,
+  stickers = DEFAULT_STICKERS,
 }) => {
   const tokens = useAppDesignTokens();
 
@@ -78,9 +46,9 @@ export const StickerPicker: React.FC<StickerPickerProps> = ({
       <AtomicText style={styles.title}>Emoji</AtomicText>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.grid}>
-          {STICKERS.map((sticker, index) => (
+          {stickers.map((sticker, index) => (
             <TouchableOpacity
-              key={index}
+              key={sticker || index}
               style={styles.sticker}
               onPress={() => onSelectSticker(sticker)}
             >
@@ -92,3 +60,5 @@ export const StickerPicker: React.FC<StickerPickerProps> = ({
     </View>
   );
 };
+
+export default React.memo(StickerPicker);

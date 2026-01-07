@@ -78,3 +78,5 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
     </View>
   );
 };
+
+export default React.memo(EditorCanvas);

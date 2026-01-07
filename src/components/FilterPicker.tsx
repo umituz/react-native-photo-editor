@@ -5,24 +5,25 @@ import {
   AtomicIcon,
   useAppDesignTokens,
 } from "@umituz/react-native-design-system";
+import { DEFAULT_FILTERS, type FilterType } from "../constants";
 
-const FILTERS = [
-  { id: "none", name: "None", icon: "close-circle" as const, value: 0 },
-  { id: "sepia", name: "Sepia", icon: "color-palette" as const, value: 0.5 },
-  { id: "grayscale", name: "B&W", icon: "contrast" as const, value: 1 },
-  { id: "vintage", name: "Vintage", icon: "time" as const, value: 0.7 },
-  { id: "warm", name: "Warm", icon: "sunny" as const, value: 0.3 },
-  { id: "cool", name: "Cool", icon: "snow" as const, value: 0.3 },
-] as const;
+interface FilterOption {
+  id: FilterType;
+  name: string;
+  icon: string;
+  value: number;
+}
 
 interface FilterPickerProps {
   selectedFilter: string;
   onSelectFilter: (filterId: string, value: number) => void;
+  filters?: readonly FilterOption[];
 }
 
 export const FilterPicker: React.FC<FilterPickerProps> = ({
   selectedFilter,
   onSelectFilter,
+  filters = DEFAULT_FILTERS,
 }) => {
   const tokens = useAppDesignTokens();
 
@@ -65,7 +66,7 @@ export const FilterPicker: React.FC<FilterPickerProps> = ({
     <View style={styles.container}>
       <AtomicText style={styles.title}>Filters</AtomicText>
       <View style={styles.grid}>
-        {FILTERS.map((filter) => (
+        {filters.map((filter) => (
           <TouchableOpacity
             key={filter.id}
             style={[
@@ -75,7 +76,7 @@ export const FilterPicker: React.FC<FilterPickerProps> = ({
             onPress={() => onSelectFilter(filter.id, filter.value)}
           >
             <AtomicIcon
-              name={filter.icon}
+              name={filter.icon as "close-circle" | "color-palette" | "contrast" | "time" | "sunny" | "snow"}
               size="lg"
               color={selectedFilter === filter.id ? "primary" : "textSecondary"}
             />
@@ -93,3 +94,5 @@ export const FilterPicker: React.FC<FilterPickerProps> = ({
     </View>
   );
 };
+
+export default React.memo(FilterPicker);

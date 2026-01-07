@@ -23,7 +23,8 @@
     "react-native": "*",
     "@umituz/react-native-design-system": "*",
     "react-native-gesture-handler": "*",
-    "react-native-reanimated": "*"
+    "react-native-reanimated": "*",
+    "react-native-safe-area-context": "*"
   },
   "dependencies": {
     "expo-image-picker": "*",
@@ -40,6 +41,7 @@
     "typescript": "*",
     "react-native-gesture-handler": "*",
     "react-native-reanimated": "*",
+    "react-native-safe-area-context": "*",
     "expo-application": "*",
     "expo-device": "*",
     "expo-linear-gradient": "*"

@@ -20,6 +20,7 @@ import { TextEditorSheet } from "./components/TextEditorSheet";
 import { createEditorStyles } from "./styles";
 import { usePhotoEditorUI } from "./hooks/usePhotoEditorUI";
 import { Layer } from "./types";
+import { DEFAULT_FONTS } from "./constants";
 
 export interface EditorActions {
   addTextLayer: (tokens: DesignTokens) => string;
@@ -36,9 +37,10 @@ export interface PhotoEditorProps {
   customTools?: React.ReactNode | ((actions: EditorActions) => React.ReactNode);
   initialCaption?: string;
   t: (key: string) => string;
+  fonts?: readonly string[];
+  stickers?: readonly string[];
+  showAI?: boolean;
 }
-
-const FONTS = ["Impact", "Comic", "Serif", "Retro"] as const;
 
 export const PhotoEditor: React.FC<PhotoEditorProps> = ({
   imageUri,
@@ -48,6 +50,9 @@ export const PhotoEditor: React.FC<PhotoEditorProps> = ({
   customTools,
   initialCaption,
   t,
+  fonts = DEFAULT_FONTS,
+  stickers,
+  showAI = false,
 }) => {
   const tokens = useAppDesignTokens();
   const insets = useSafeAreaInsets();
@@ -118,7 +123,7 @@ export const PhotoEditor: React.FC<PhotoEditorProps> = ({
           <FontControls
             fontSize={fontSize}
             selectedFont={selectedFont}
-            fonts={FONTS}
+            fonts={fonts}
             onFontSizeChange={(s) => setFontSize(Math.max(12, Math.min(96, s)))}
             onFontSelect={setSelectedFont}
             styles={styles}
@@ -130,6 +135,7 @@ export const PhotoEditor: React.FC<PhotoEditorProps> = ({
           onAddSticker={() => stickerSheetRef.current?.present()}
           onOpenFilters={() => filterSheetRef.current?.present()}
           onOpenLayers={() => layerSheetRef.current?.present()}
+          onAIMagic={showAI ? undefined : undefined}
           styles={styles}
           t={t}
         />
@@ -144,7 +150,7 @@ export const PhotoEditor: React.FC<PhotoEditorProps> = ({
         </BottomSheetModal>
 
         <BottomSheetModal ref={stickerSheetRef} snapPoints={["50%"]}>
-          <StickerPicker onSelectSticker={handleSelectSticker} />
+          <StickerPicker stickers={stickers} onSelectSticker={handleSelectSticker} />
         </BottomSheetModal>
 
         <BottomSheetModal ref={filterSheetRef} snapPoints={["40%"]}>

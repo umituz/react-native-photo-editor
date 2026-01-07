@@ -61,3 +61,5 @@ export const TextEditorSheet: React.FC<TextEditorSheetProps> = ({
     </View>
   );
 };
+
+export default React.memo(TextEditorSheet);

@@ -80,3 +80,5 @@ export const FontControls: React.FC<FontControlsProps> = ({
     </View>
   );
 };
+
+export default React.memo(FontControls);

@@ -1,4 +1,5 @@
 export * from "./types";
+export * from "./constants";
 export * from "./hooks/usePhotoEditor";
 export * from "./core/HistoryManager";
 export * from "./components/EditorCanvas";
