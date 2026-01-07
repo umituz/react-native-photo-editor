@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -22,8 +22,8 @@ interface DraggableTextProps {
   scale?: number;
   opacity?: number;
   backgroundColor?: string;
-  strokeColor?: string;
-  strokeWidth?: number;
+  _strokeColor?: string;
+  _strokeWidth?: number;
   initialX: number;
   initialY: number;
   onDragEnd: (x: number, y: number) => void;
@@ -41,8 +41,8 @@ export const DraggableText: React.FC<DraggableTextProps> = ({
   scale = 1,
   opacity = 1,
   backgroundColor = "transparent",
-  strokeColor,
-  strokeWidth = 2,
+  _strokeColor,
+  _strokeWidth = 2,
   initialX,
   initialY,
   onDragEnd,

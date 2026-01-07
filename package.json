@@ -21,12 +21,27 @@
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
-    "@umituz/react-native-design-system": "*"
+    "@umituz/react-native-design-system": "*",
+    "react-native-gesture-handler": "*",
+    "react-native-reanimated": "*"
   },
   "dependencies": {
     "expo-image-picker": "*",
     "expo-media-library": "*",
     "expo-file-system": "*",
     "expo-image": "*"
+  },
+  "devDependencies": {
+    "@types/react": "*",
+    "@types/react-native": "*",
+    "@typescript-eslint/parser": "*",
+    "@typescript-eslint/eslint-plugin": "*",
+    "eslint": "*",
+    "typescript": "*",
+    "react-native-gesture-handler": "*",
+    "react-native-reanimated": "*",
+    "expo-application": "*",
+    "expo-device": "*",
+    "expo-linear-gradient": "*"
   }
 }

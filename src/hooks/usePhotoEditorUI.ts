@@ -1,6 +1,7 @@
 import { useRef, useState, useCallback, useEffect } from "react";
 import { BottomSheetModalRef, DesignTokens } from "@umituz/react-native-design-system";
 import { usePhotoEditor } from "./usePhotoEditor";
+import { Layer, TextLayer } from "../types";
 
 export const usePhotoEditorUI = (
   initialCaption: string | undefined,
@@ -32,16 +33,17 @@ export const usePhotoEditorUI = (
   useEffect(() => {
     if (initialCaption) {
       const id = addTextLayer(tokens);
-      setTimeout(() => {
-        updateLayer(id, { text: initialCaption } as any, true);
-      }, 0);
+      void Promise.resolve().then(() => {
+        updateLayer(id, { text: initialCaption } as Partial<Layer>, true);
+      });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [initialCaption, addTextLayer, tokens]);
 
   const handleAddText = useCallback(() => {
     addTextLayer(tokens);
-    setTimeout(() => textEditorSheetRef.current?.present(), 100);
+    void Promise.resolve().then(() => {
+      textEditorSheetRef.current?.present();
+    });
   }, [addTextLayer, tokens]);
 
   const handleTextLayerTap = useCallback(
@@ -49,8 +51,9 @@ export const usePhotoEditorUI = (
       selectLayer(layerId);
       const layer = layers.find((l) => l.id === layerId);
       if (layer?.type === "text") {
-        setEditingText((layer as any).text || "");
-        setFontSize((layer as any).fontSize || 48);
+        const textLayer = layer as TextLayer;
+        setEditingText(textLayer.text || "");
+        setFontSize(textLayer.fontSize || 48);
         textEditorSheetRef.current?.present();
       }
     },
@@ -63,10 +66,10 @@ export const usePhotoEditorUI = (
         text: editingText,
         fontSize,
         fontFamily: selectedFont,
-      } as any);
+      } as Partial<Layer>);
     }
     textEditorSheetRef.current?.dismiss();
-  }, [activeLayerId, editingText, fontSize, selectedFont, updateLayer]);
+  }, [activeLayerId, editingText, fontSize, selectedFont, updateLayer, textEditorSheetRef]);
 
   const handleSelectFilter = useCallback(
     (filterId: string, value: number) => {

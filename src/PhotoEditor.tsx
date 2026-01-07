@@ -7,6 +7,7 @@ import {
   BottomSheetModal,
   SafeBottomSheetModalProvider,
   useSafeAreaInsets,
+  DesignTokens,
 } from "@umituz/react-native-design-system";
 
 import { EditorCanvas } from "./components/EditorCanvas";
@@ -18,11 +19,12 @@ import { LayerManager } from "./components/LayerManager";
 import { TextEditorSheet } from "./components/TextEditorSheet";
 import { createEditorStyles } from "./styles";
 import { usePhotoEditorUI } from "./hooks/usePhotoEditorUI";
+import { Layer } from "./types";
 
 export interface EditorActions {
-  addTextLayer: (tokens: any) => string;
-  updateLayer: (id: string, updates: any) => void;
-  getLayers: () => any[];
+  addTextLayer: (tokens: DesignTokens) => string;
+  updateLayer: (id: string, updates: Partial<Layer>) => void;
+  getLayers: () => Layer[];
   getActiveLayerId: () => string | null;
 }
 

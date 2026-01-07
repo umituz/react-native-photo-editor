@@ -6,21 +6,14 @@ import {
   useAppDesignTokens,
 } from "@umituz/react-native-design-system";
 
-interface FilterOption {
-  id: string;
-  name: string;
-  icon: string;
-  value: number;
-}
-
-const FILTERS: FilterOption[] = [
-  { id: "none", name: "None", icon: "close-circle", value: 0 },
-  { id: "sepia", name: "Sepia", icon: "color-palette", value: 0.5 },
-  { id: "grayscale", name: "B&W", icon: "contrast", value: 1 },
-  { id: "vintage", name: "Vintage", icon: "time", value: 0.7 },
-  { id: "warm", name: "Warm", icon: "sunny", value: 0.3 },
-  { id: "cool", name: "Cool", icon: "snow", value: 0.3 },
-];
+const FILTERS = [
+  { id: "none", name: "None", icon: "close-circle" as const, value: 0 },
+  { id: "sepia", name: "Sepia", icon: "color-palette" as const, value: 0.5 },
+  { id: "grayscale", name: "B&W", icon: "contrast" as const, value: 1 },
+  { id: "vintage", name: "Vintage", icon: "time" as const, value: 0.7 },
+  { id: "warm", name: "Warm", icon: "sunny" as const, value: 0.3 },
+  { id: "cool", name: "Cool", icon: "snow" as const, value: 0.3 },
+] as const;
 
 interface FilterPickerProps {
   selectedFilter: string;
@@ -82,7 +75,7 @@ export const FilterPicker: React.FC<FilterPickerProps> = ({
             onPress={() => onSelectFilter(filter.id, filter.value)}
           >
             <AtomicIcon
-              name={filter.icon as any}
+              name={filter.icon}
               size="lg"
               color={selectedFilter === filter.id ? "primary" : "textSecondary"}
             />

@@ -15,7 +15,7 @@ import {
 interface AIMagicSheetProps {
   onGenerateCaption: (style: string) => void;
   isLoading?: boolean;
-  t: (key: string) => string;
+  _t: (key: string) => string;
 }
 
 const AI_STYLES = [
@@ -30,7 +30,7 @@ const AI_STYLES = [
 export const AIMagicSheet: React.FC<AIMagicSheetProps> = ({
   onGenerateCaption,
   isLoading = false,
-  t,
+  _t,
 }) => {
   const tokens = useAppDesignTokens();
   const [selectedStyle, setSelectedStyle] = useState<string | null>(null);

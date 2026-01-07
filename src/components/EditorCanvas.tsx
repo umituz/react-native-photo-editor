@@ -47,8 +47,8 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
               scale={textLayer.scale}
               opacity={textLayer.opacity}
               backgroundColor={textLayer.backgroundColor}
-              strokeColor={textLayer.strokeColor}
-              strokeWidth={textLayer.strokeWidth}
+              _strokeColor={textLayer.strokeColor}
+              _strokeWidth={textLayer.strokeWidth}
               initialX={textLayer.x}
               initialY={textLayer.y}
               onDragEnd={(x, y) => onLayerMove(layer.id, x, y)}
