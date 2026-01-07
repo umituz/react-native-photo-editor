@@ -1,0 +1,160 @@
+import { StyleSheet } from "react-native";
+import { DesignTokens } from "@umituz/react-native-design-system";
+import { EdgeInsets } from "react-native-safe-area-context";
+
+export const createEditorStyles = (tokens: DesignTokens, insets: EdgeInsets) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: tokens.colors.background },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: tokens.spacing.md,
+      paddingTop: insets.top + tokens.spacing.sm,
+      paddingBottom: tokens.spacing.sm,
+    },
+    headerButton: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontWeight: "bold",
+      color: tokens.colors.textPrimary,
+    },
+    postButton: {
+      backgroundColor: tokens.colors.primary,
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 999,
+    },
+    postButtonText: {
+      color: tokens.colors.onPrimary,
+      fontWeight: "bold",
+      fontSize: 14,
+    },
+    scrollContent: { paddingHorizontal: tokens.spacing.md, paddingBottom: 120 },
+    canvas: {
+      width: "100%",
+      aspectRatio: 4 / 5,
+      borderRadius: 16,
+      overflow: "hidden",
+      backgroundColor: tokens.colors.surfaceVariant,
+      marginTop: tokens.spacing.sm,
+    },
+    canvasImage: { width: "100%", height: "100%" },
+    // Slider & Controls
+    controlsPanel: {
+      marginTop: tokens.spacing.md,
+      backgroundColor: tokens.colors.surfaceVariant + "80", // Opacity handled by token if possible, else hex
+      borderRadius: 16,
+      padding: tokens.spacing.md,
+      borderWidth: 1,
+      borderColor: tokens.colors.border,
+    },
+    sliderRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: tokens.spacing.sm,
+    },
+    sliderLabel: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: tokens.spacing.xs,
+    },
+    sliderLabelText: { fontSize: 14, color: tokens.colors.textSecondary },
+    sliderValue: {
+      fontSize: 14,
+      fontWeight: "bold",
+      color: tokens.colors.primary,
+    },
+    sliderTrack: {
+      height: 6,
+      backgroundColor: tokens.colors.border,
+      borderRadius: 3,
+      marginBottom: tokens.spacing.lg,
+    },
+    sliderFill: {
+      height: "100%",
+      width: "65%",
+      backgroundColor: tokens.colors.primary,
+      borderRadius: 3,
+    },
+    fontLabel: {
+      fontSize: 14,
+      color: tokens.colors.textSecondary,
+      marginBottom: tokens.spacing.sm,
+    },
+    fontRow: { flexDirection: "row", gap: tokens.spacing.sm },
+    fontChip: {
+      paddingHorizontal: tokens.spacing.md,
+      paddingVertical: tokens.spacing.sm,
+      backgroundColor: tokens.colors.surfaceVariant,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: tokens.colors.border,
+    },
+    fontChipActive: {
+      backgroundColor: tokens.colors.primary,
+      borderColor: tokens.colors.primary,
+    },
+    fontChipText: {
+      fontWeight: "bold",
+      fontSize: 14,
+      color: tokens.colors.textSecondary,
+    },
+    fontChipTextActive: { color: tokens.colors.onPrimary },
+    // Bottom Toolbar
+    bottomToolbar: {
+      position: "absolute",
+      bottom: insets.bottom + tokens.spacing.md,
+      left: "5%",
+      right: "5%",
+      backgroundColor: tokens.colors.surfaceVariant,
+      borderRadius: 999,
+      padding: tokens.spacing.sm,
+      flexDirection: "row",
+      justifyContent: "space-around",
+      alignItems: "center",
+      borderWidth: 1,
+      borderColor: tokens.colors.border,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.1,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+    toolButton: {
+      alignItems: "center",
+      justifyContent: "center",
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+    },
+    toolButtonActive: { backgroundColor: tokens.colors.primary + "20" },
+    toolLabel: {
+      fontSize: 10,
+      fontWeight: "500",
+      color: tokens.colors.textSecondary,
+      marginTop: 2,
+    },
+    toolLabelActive: { color: tokens.colors.primary },
+    aiMagicButton: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      backgroundColor: tokens.colors.primary,
+      alignItems: "center",
+      justifyContent: "center",
+      marginTop: -32,
+      borderWidth: 4,
+      borderColor: tokens.colors.background,
+    },
+  });
