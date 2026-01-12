@@ -1,6 +1,6 @@
 import React from "react";
-import { View, ScrollView, TouchableOpacity } from "react-native";
-import { AtomicText, AtomicIcon } from "@umituz/react-native-design-system";
+import { View, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
+import { AtomicText, AtomicIcon, useAppDesignTokens } from "@umituz/react-native-design-system";
 
 interface FontControlsProps {
   fontSize: number;
@@ -17,65 +17,62 @@ export const FontControls: React.FC<FontControlsProps> = ({
   fonts,
   onFontSizeChange,
   onFontSelect,
-  styles,
+  styles: externalStyles,
 }) => {
+  const tokens = useAppDesignTokens();
+  
+  const styles = StyleSheet.create({
+    btn: {
+      padding: tokens.spacing.sm,
+      backgroundColor: tokens.colors.surface,
+      borderRadius: tokens.borders.radius.sm,
+      borderWidth: 1,
+      borderColor: tokens.colors.border,
+      minWidth: 44,
+      alignItems: "center",
+    }
+  });
+
   return (
-    <View style={styles.controlsPanel}>
-      <View style={styles.sliderRow}>
-        <View style={styles.sliderLabel}>
+    <View style={externalStyles.controlsPanel}>
+      <View style={externalStyles.sliderRow}>
+        <View style={externalStyles.sliderLabel}>
           <AtomicIcon name="text" size="sm" color="textSecondary" />
-          <AtomicText style={styles.sliderLabelText}>Text Size</AtomicText>
+          <AtomicText type="labelMedium" color="textSecondary">Text Size</AtomicText>
         </View>
-        <AtomicText style={styles.sliderValue}>{fontSize}px</AtomicText>
+        <AtomicText fontWeight="bold" color="primary">{fontSize}px</AtomicText>
       </View>
-      <View style={styles.sliderTrack}>
-        <View
-          style={[
-            styles.sliderFill,
-            { width: `${((fontSize - 12) / 84) * 100}%` },
-          ]}
-        />
-      </View>
-      <View style={{ flexDirection: "row", gap: 8, marginBottom: 16 }}>
-        <TouchableOpacity
-          onPress={() => onFontSizeChange(fontSize - 4)}
-          style={styles.fontChip}
-        >
-          <AtomicText style={styles.fontChipText}>-</AtomicText>
+
+      <View style={{ flexDirection: "row", gap: tokens.spacing.sm, marginBottom: tokens.spacing.md }}>
+        <TouchableOpacity onPress={() => onFontSizeChange(fontSize - 4)} style={styles.btn}>
+          <AtomicText fontWeight="bold">-</AtomicText>
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => onFontSizeChange(fontSize + 4)}
-          style={styles.fontChip}
-        >
-          <AtomicText style={styles.fontChipText}>+</AtomicText>
+        <TouchableOpacity onPress={() => onFontSizeChange(fontSize + 4)} style={styles.btn}>
+          <AtomicText fontWeight="bold">+</AtomicText>
         </TouchableOpacity>
       </View>
 
-      <AtomicText style={styles.fontLabel}>Font Style</AtomicText>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.fontRow}
-      >
-        {fonts.map((font) => (
-          <TouchableOpacity
-            key={font}
-            style={[
-              styles.fontChip,
-              selectedFont === font && styles.fontChipActive,
-            ]}
-            onPress={() => onFontSelect(font)}
-          >
-            <AtomicText
-              style={[
-                styles.fontChipText,
-                selectedFont === font && styles.fontChipTextActive,
-              ]}
+      <AtomicText type="labelMedium" color="textSecondary" style={{ marginBottom: tokens.spacing.xs }}>
+        Font Style
+      </AtomicText>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <View style={externalStyles.fontRow}>
+          {fonts.map((font) => (
+            <TouchableOpacity
+              key={font}
+              style={[externalStyles.fontChip, selectedFont === font && externalStyles.fontChipActive]}
+              onPress={() => onFontSelect(font)}
             >
-              {font}
-            </AtomicText>
-          </TouchableOpacity>
-        ))}
+              <AtomicText
+                fontWeight="bold"
+                color={selectedFont === font ? "onPrimary" : "textSecondary"}
+                style={{ fontFamily: font }}
+              >
+                {font}
+              </AtomicText>
+            </TouchableOpacity>
+          ))}
+        </View>
       </ScrollView>
     </View>
   );

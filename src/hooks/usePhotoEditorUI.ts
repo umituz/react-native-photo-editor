@@ -1,7 +1,7 @@
 import { useRef, useState, useCallback, useEffect } from "react";
 import { BottomSheetModalRef, DesignTokens } from "@umituz/react-native-design-system";
 import { usePhotoEditor } from "./usePhotoEditor";
-import { Layer, TextLayer } from "../types";
+import { TextLayer } from "../types";
 
 export const usePhotoEditorUI = (
   initialCaption: string | undefined,
@@ -11,45 +11,26 @@ export const usePhotoEditorUI = (
   const stickerSheetRef = useRef<BottomSheetModalRef>(null);
   const filterSheetRef = useRef<BottomSheetModalRef>(null);
   const layerSheetRef = useRef<BottomSheetModalRef>(null);
+  const aiSheetRef = useRef<BottomSheetModalRef>(null);
 
-  const [selectedFont, setSelectedFont] = useState<string>("Impact");
+  const [selectedFont, setSelectedFont] = useState<string>("System");
   const [fontSize, setFontSize] = useState(48);
   const [editingText, setEditingText] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("none");
 
-  const {
-    layers,
-    activeLayerId,
-    addTextLayer,
-    addStickerLayer,
-    updateLayer,
-    deleteLayer,
-    selectLayer,
-    updateFilters,
-    filters,
-  } = usePhotoEditor([]);
+  const editor = usePhotoEditor([]);
 
-  // Handle initial caption
   useEffect(() => {
     if (initialCaption) {
-      const id = addTextLayer(tokens);
-      void Promise.resolve().then(() => {
-        updateLayer(id, { text: initialCaption } as Partial<Layer>, true);
-      });
+      const id = editor.addTextLayer(tokens);
+      editor.updateLayer(id, { text: initialCaption });
     }
-  }, [initialCaption, addTextLayer, tokens]);
-
-  const handleAddText = useCallback(() => {
-    addTextLayer(tokens);
-    void Promise.resolve().then(() => {
-      textEditorSheetRef.current?.present();
-    });
-  }, [addTextLayer, tokens]);
+  }, [initialCaption]);
 
   const handleTextLayerTap = useCallback(
     (layerId: string) => {
-      selectLayer(layerId);
-      const layer = layers.find((l) => l.id === layerId);
+      editor.selectLayer(layerId);
+      const layer = editor.layers.find((l) => l.id === layerId);
       if (layer?.type === "text") {
         const textLayer = layer as TextLayer;
         setEditingText(textLayer.text || "");
@@ -57,53 +38,27 @@ export const usePhotoEditorUI = (
         textEditorSheetRef.current?.present();
       }
     },
-    [selectLayer, layers],
+    [editor],
   );
 
   const handleSaveText = useCallback(() => {
-    if (activeLayerId) {
-      updateLayer(activeLayerId, {
+    if (editor.activeLayerId) {
+      editor.updateLayer(editor.activeLayerId, {
         text: editingText,
         fontSize,
         fontFamily: selectedFont,
-      } as Partial<Layer>);
+      });
     }
     textEditorSheetRef.current?.dismiss();
-  }, [activeLayerId, editingText, fontSize, selectedFont, updateLayer, textEditorSheetRef]);
-
-  const handleSelectFilter = useCallback(
-    (filterId: string, value: number) => {
-      setSelectedFilter(filterId);
-      const base = {
-        brightness: 1,
-        contrast: 1,
-        saturation: 1,
-        sepia: 0,
-        grayscale: 0,
-      };
-      if (filterId === "sepia") updateFilters({ ...base, sepia: value });
-      else if (filterId === "grayscale")
-        updateFilters({ ...base, grayscale: value });
-      else updateFilters(base);
-    },
-    [updateFilters],
-  );
-
-  const handleSelectSticker = useCallback(
-    (sticker: string) => {
-      addStickerLayer(sticker);
-      stickerSheetRef.current?.dismiss();
-    },
-    [addStickerLayer],
-  );
+  }, [editor.activeLayerId, editingText, fontSize, selectedFont, editor.updateLayer]);
 
   return {
-    // Refs
+    ...editor,
     textEditorSheetRef,
     stickerSheetRef,
     filterSheetRef,
     layerSheetRef,
-    // State
+    aiSheetRef,
     selectedFont,
     setSelectedFont,
     fontSize,
@@ -111,20 +66,20 @@ export const usePhotoEditorUI = (
     editingText,
     setEditingText,
     selectedFilter,
-    // Domain State
-    layers,
-    activeLayerId,
-    filters,
-    // Domain Actions
-    updateLayer,
-    deleteLayer,
-    selectLayer,
-    addTextLayer,
-    // UI Actions
-    handleAddText,
     handleTextLayerTap,
     handleSaveText,
-    handleSelectFilter,
-    handleSelectSticker,
+    handleAddText: () => {
+      editor.addTextLayer(tokens);
+      textEditorSheetRef.current?.present();
+    },
+    handleSelectSticker: (s: string) => {
+      editor.addStickerLayer(s);
+      stickerSheetRef.current?.dismiss();
+    },
+    handleSelectFilter: (id: string, val: number) => {
+      setSelectedFilter(id);
+      editor.updateFilters({ ...editor.filters, [id]: val });
+      filterSheetRef.current?.dismiss();
+    }
   };
 };

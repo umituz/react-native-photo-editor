@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
-import { Layer, TextLayer, ImageFilters } from "../types";
-import { HistoryManager } from "../core/HistoryManager";
+import { DesignTokens } from "@umituz/react-native-design-system";
+import { Layer, TextLayer, StickerLayer, ImageFilters } from "../types";
+import { HistoryManager, HistoryState } from "../core/HistoryManager";
 
 const DEFAULT_FILTERS: ImageFilters = {
   brightness: 1,
@@ -10,12 +11,9 @@ const DEFAULT_FILTERS: ImageFilters = {
   grayscale: 0,
 };
 
-const historyManager = new HistoryManager<Layer[]>();
-
-import { DesignTokens } from "@umituz/react-native-design-system";
-
 export const usePhotoEditor = (initialLayers: Layer[] = []) => {
-  const [history, setHistory] = useState(() =>
+  const historyManager = useMemo(() => new HistoryManager<Layer[]>(), []);
+  const [history, setHistory] = useState<HistoryState<Layer[]>>(() =>
     historyManager.createInitialState(initialLayers),
   );
   const [activeLayerId, setActiveLayerId] = useState<string | null>(
@@ -25,15 +23,12 @@ export const usePhotoEditor = (initialLayers: Layer[] = []) => {
 
   const layers = history.present;
 
-  const canUndo = historyManager.canUndo(history);
-  const canRedo = historyManager.canRedo(history);
-
   const pushState = useCallback((newLayers: Layer[]) => {
     setHistory((prev) => historyManager.push(prev, newLayers));
-  }, []);
+  }, [historyManager]);
 
   const addTextLayer = useCallback(
-    (defaultTokens: DesignTokens) => {
+    (tokens: DesignTokens) => {
       const id = `text-${Date.now()}`;
       const newLayer: TextLayer = {
         id,
@@ -47,16 +42,12 @@ export const usePhotoEditor = (initialLayers: Layer[] = []) => {
         zIndex: layers.length,
         fontSize: 32,
         fontFamily: "System",
-        color: defaultTokens.colors.onPrimary,
+        color: tokens.colors.textPrimary,
         backgroundColor: "transparent",
         textAlign: "center",
-        strokeWidth: 2,
-        strokeColor: defaultTokens.colors.onBackground,
       };
-
-      const newLayers: Layer[] = [...layers, newLayer];
-      pushState(newLayers);
-      setActiveLayerId(newLayer.id);
+      pushState([...layers, newLayer]);
+      setActiveLayerId(id);
       return id;
     },
     [layers, pushState],
@@ -65,10 +56,10 @@ export const usePhotoEditor = (initialLayers: Layer[] = []) => {
   const addStickerLayer = useCallback(
     (uri: string) => {
       const id = `sticker-${Date.now()}`;
-      const newLayer: Layer = {
+      const newLayer: StickerLayer = {
         id,
         type: "sticker",
-        uri: uri,
+        uri,
         x: 100,
         y: 100,
         rotation: 0,
@@ -76,90 +67,44 @@ export const usePhotoEditor = (initialLayers: Layer[] = []) => {
         opacity: 1,
         zIndex: layers.length,
       };
-
-      const newLayers: Layer[] = [...layers, newLayer];
-      pushState(newLayers);
-      setActiveLayerId(newLayer.id);
+      pushState([...layers, newLayer]);
+      setActiveLayerId(id);
       return id;
     },
     [layers, pushState],
   );
 
   const updateLayer = useCallback(
-    (id: string, updates: Partial<Layer>, silent = false) => {
-      const newLayers: Layer[] = layers.map((layer) =>
-        layer.id === id ? ({ ...layer, ...updates } as Layer) : layer,
-      );
-      if (silent) {
-        // Just update state without pushing to history (hacky but works for init)
-        setHistory((prev) => ({ ...prev, present: newLayers }));
-      } else {
-        pushState(newLayers);
-      }
+    (id: string, updates: Partial<Layer>) => {
+      const newLayers = layers.map((l) => (l.id === id ? { ...l, ...updates } : l) as Layer);
+      pushState(newLayers);
     },
     [layers, pushState],
   );
 
   const deleteLayer = useCallback(
     (id: string) => {
-      if (layers.length <= 1) return;
-      const newLayers = layers.filter((layer) => layer.id !== id);
+      const newLayers = layers.filter((l) => l.id !== id);
       pushState(newLayers);
-      if (activeLayerId === id) {
-        setActiveLayerId(newLayers[0]?.id || null);
-      }
+      if (activeLayerId === id) setActiveLayerId(newLayers[0]?.id || null);
     },
     [layers, activeLayerId, pushState],
   );
 
-  const undo = useCallback(() => {
-    setHistory((prev) => historyManager.undo(prev));
-  }, []);
-
-  const redo = useCallback(() => {
-    setHistory((prev) => historyManager.redo(prev));
-  }, []);
-
-  const selectLayer = useCallback((id: string) => {
-    setActiveLayerId(id);
-  }, []);
-
-  const bringToFront = useCallback(
-    (id: string) => {
-      const maxZ = Math.max(...layers.map((l) => l.zIndex), 0);
-      updateLayer(id, { zIndex: maxZ + 1 });
-    },
-    [layers, updateLayer],
-  );
-
-  const captureImage = useCallback(
-    async (_viewRef: unknown, backgroundUrl: string) => {
-      return backgroundUrl;
-    },
-    [],
-  );
-
-  const activeLayer = useMemo(
-    () => layers.find((l) => l.id === activeLayerId),
-    [layers, activeLayerId],
-  );
-
   return {
     layers: [...layers].sort((a, b) => a.zIndex - b.zIndex),
-    activeLayer,
     activeLayerId,
+    activeLayer: layers.find((l) => l.id === activeLayerId),
     addTextLayer,
     addStickerLayer,
     updateLayer,
     deleteLayer,
-    selectLayer,
-    undo,
-    redo,
-    canUndo,
-    canRedo,
-    bringToFront,
+    selectLayer: setActiveLayerId,
+    undo: useCallback(() => setHistory(historyManager.undo), [historyManager]),
+    redo: useCallback(() => setHistory(historyManager.redo), [historyManager]),
+    canUndo: historyManager.canUndo(history),
+    canRedo: historyManager.canRedo(history),
     filters,
     updateFilters: setFilters,
-    captureImage,
   };
 };

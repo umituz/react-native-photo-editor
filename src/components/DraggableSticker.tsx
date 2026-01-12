@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   useAnimatedStyle,
@@ -15,34 +15,31 @@ interface DraggableStickerProps {
   uri: string;
   initialX: number;
   initialY: number;
-  rotation?: number;
-  scale?: number;
-  opacity?: number;
   onDragEnd: (x: number, y: number) => void;
   onPress: () => void;
   isSelected?: boolean;
+  rotation?: number;
+  scale?: number;
+  opacity?: number;
 }
 
 export const DraggableSticker: React.FC<DraggableStickerProps> = ({
   uri,
   initialX,
   initialY,
-  rotation = 0,
-  scale = 1,
-  opacity = 1,
   onDragEnd,
   onPress,
   isSelected,
+  rotation = 0,
+  scale = 1,
+  opacity = 1,
 }) => {
   const tokens = useAppDesignTokens();
   const translateX = useSharedValue(initialX);
   const translateY = useSharedValue(initialY);
-  const offset = useSharedValue({ x: 0, y: 0 });
+  const offset = useSharedValue({ x: initialX, y: initialY });
 
-  const isEmoji = uri.length <= 4 && !uri.startsWith("http");
-
-  const drag = Gesture.Pan()
-    .minDistance(5)
+  const panGesture = Gesture.Pan()
     .onStart(() => {
       offset.value = { x: translateX.value, y: translateY.value };
     })
@@ -54,45 +51,39 @@ export const DraggableSticker: React.FC<DraggableStickerProps> = ({
       runOnJS(onDragEnd)(translateX.value, translateY.value);
     });
 
-  const tap = Gesture.Tap()
-    .maxDistance(5)
-    .onEnd(() => {
-      runOnJS(onPress)();
-    });
-
-  const gesture = Gesture.Exclusive(drag, tap);
+  const tapGesture = Gesture.Tap().onEnd(() => {
+    runOnJS(onPress)();
+  });
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
       { translateX: translateX.value },
       { translateY: translateY.value },
       { rotate: `${rotation}deg` },
-      { scale: scale },
+      { scale },
     ],
-    opacity: opacity,
+    opacity,
     zIndex: isSelected ? 100 : 50,
   }));
 
-  const styles = StyleSheet.create({
-    container: { position: "absolute", left: 0, top: 0 },
-    emojiContainer: {
-      padding: 4,
-      borderRadius: 8,
-      borderWidth: isSelected ? 2 : 0,
-      borderColor: tokens.colors.primary,
-      borderStyle: "dashed",
-      backgroundColor: isSelected
-        ? tokens.colors.primary + "20"
-        : "transparent",
-    },
-    emoji: { fontSize: 64 },
-  });
+  const isEmoji = uri.length <= 4 && !uri.startsWith("http");
 
   return (
-    <GestureDetector gesture={gesture}>
-      <Animated.View style={[styles.container, animatedStyle]}>
-        <View style={styles.emojiContainer}>
-          {isEmoji ? <AtomicText style={styles.emoji}>{uri}</AtomicText> : null}
+    <GestureDetector gesture={Gesture.Exclusive(panGesture, tapGesture)}>
+      <Animated.View style={[animatedStyle, { position: "absolute" }]}>
+        <View
+          style={{
+            padding: tokens.spacing.xs,
+            borderRadius: tokens.borders.radius.sm,
+            borderWidth: isSelected ? 2 : 0,
+            borderColor: tokens.colors.primary,
+            borderStyle: "dashed",
+            backgroundColor: isSelected ? tokens.colors.primary + "10" : "transparent",
+          }}
+        >
+          {isEmoji ? (
+            <AtomicText style={{ fontSize: 48 }}>{uri}</AtomicText>
+          ) : null}
         </View>
       </Animated.View>
     </GestureDetector>

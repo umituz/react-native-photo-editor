@@ -1,9 +1,6 @@
 import React from "react";
 import { View, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
-import {
-  AtomicText,
-  useAppDesignTokens,
-} from "@umituz/react-native-design-system";
+import { AtomicText, useAppDesignTokens } from "@umituz/react-native-design-system";
 import { DEFAULT_STICKERS } from "../constants";
 
 interface StickerPickerProps {
@@ -18,41 +15,26 @@ export const StickerPicker: React.FC<StickerPickerProps> = ({
   const tokens = useAppDesignTokens();
 
   const styles = StyleSheet.create({
-    container: { padding: 16 },
-    title: {
-      fontSize: 18,
-      fontWeight: "bold",
-      color: tokens.colors.textPrimary,
-      marginBottom: 16,
-    },
-    grid: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      gap: 12,
-    },
+    container: { padding: tokens.spacing.md, gap: tokens.spacing.md },
+    grid: { flexDirection: "row", flexWrap: "wrap", gap: tokens.spacing.sm },
     sticker: {
-      width: 56,
-      height: 56,
-      borderRadius: 12,
+      width: 50,
+      height: 50,
+      borderRadius: tokens.borders.radius.sm,
       backgroundColor: tokens.colors.surfaceVariant,
       alignItems: "center",
       justifyContent: "center",
     },
-    stickerText: { fontSize: 32 },
   });
 
   return (
     <View style={styles.container}>
-      <AtomicText style={styles.title}>Emoji</AtomicText>
+      <AtomicText type="headlineSmall">Stickers</AtomicText>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.grid}>
-          {stickers.map((sticker, index) => (
-            <TouchableOpacity
-              key={sticker || index}
-              style={styles.sticker}
-              onPress={() => onSelectSticker(sticker)}
-            >
-              <AtomicText style={styles.stickerText}>{sticker}</AtomicText>
+          {stickers.map((s, i) => (
+            <TouchableOpacity key={`${s}-${i}`} style={styles.sticker} onPress={() => onSelectSticker(s)}>
+              <AtomicText style={{ fontSize: 32 }}>{s}</AtomicText>
             </TouchableOpacity>
           ))}
         </View>

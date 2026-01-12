@@ -42,6 +42,13 @@ export const DEFAULT_STICKERS = [
 
 export type FilterType = "none" | "sepia" | "grayscale" | "vintage" | "warm" | "cool";
 
+export interface FilterOption {
+  id: FilterType;
+  name: string;
+  icon: string;
+  value: number;
+}
+
 export const DEFAULT_FILTERS = [
   { id: "none" as FilterType, name: "None", icon: "close-circle", value: 0 },
   { id: "sepia" as FilterType, name: "Sepia", icon: "color-palette", value: 0.5 },

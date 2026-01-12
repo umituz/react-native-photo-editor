@@ -1,9 +1,6 @@
 import React from "react";
-import { View, TextInput, TouchableOpacity, StyleSheet } from "react-native";
-import {
-  AtomicText,
-  useAppDesignTokens,
-} from "@umituz/react-native-design-system";
+import { View, TextInput, StyleSheet } from "react-native";
+import { AtomicText, useAppDesignTokens, AtomicButton } from "@umituz/react-native-design-system";
 
 interface TextEditorSheetProps {
   value: string;
@@ -21,29 +18,22 @@ export const TextEditorSheet: React.FC<TextEditorSheetProps> = ({
   const tokens = useAppDesignTokens();
 
   const styles = StyleSheet.create({
-    container: { padding: 16 },
-    title: { fontSize: 18, fontWeight: "bold", marginBottom: 16 },
+    container: { padding: tokens.spacing.md, gap: tokens.spacing.md },
     input: {
       backgroundColor: tokens.colors.surfaceVariant,
-      borderRadius: 12,
-      padding: 16,
+      borderRadius: tokens.borders.radius.md,
+      padding: tokens.spacing.md,
       fontSize: 18,
       color: tokens.colors.textPrimary,
-      marginBottom: 16,
       textAlign: "center",
+      minHeight: 120,
     },
-    saveButton: {
-      backgroundColor: tokens.colors.primary,
-      borderRadius: 999,
-      padding: 16,
-      alignItems: "center",
-    },
-    saveButtonText: { color: tokens.colors.onPrimary, fontWeight: "bold" },
   });
 
   return (
     <View style={styles.container}>
-      <AtomicText style={styles.title}>{t("editor.add_text")}</AtomicText>
+      <AtomicText type="headlineSmall">{t("editor.add_text")}</AtomicText>
+      
       <TextInput
         value={value}
         onChangeText={onChange}
@@ -53,11 +43,10 @@ export const TextEditorSheet: React.FC<TextEditorSheetProps> = ({
         multiline
         autoFocus
       />
-      <TouchableOpacity onPress={onSave} style={styles.saveButton}>
-        <AtomicText style={styles.saveButtonText}>
-          {t("common.save")}
-        </AtomicText>
-      </TouchableOpacity>
+
+      <AtomicButton variant="primary" onPress={onSave}>
+        {t("common.save")}
+      </AtomicButton>
     </View>
   );
 };

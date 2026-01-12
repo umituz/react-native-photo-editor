@@ -1,18 +1,7 @@
 import React from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
-import {
-  AtomicText,
-  AtomicIcon,
-  useAppDesignTokens,
-} from "@umituz/react-native-design-system";
-import { DEFAULT_FILTERS, type FilterType } from "../constants";
-
-interface FilterOption {
-  id: FilterType;
-  name: string;
-  icon: string;
-  value: number;
-}
+import { AtomicText, AtomicIcon, useAppDesignTokens } from "@umituz/react-native-design-system";
+import { DEFAULT_FILTERS, type FilterOption } from "../constants";
 
 interface FilterPickerProps {
   selectedFilter: string;
@@ -28,65 +17,44 @@ export const FilterPicker: React.FC<FilterPickerProps> = ({
   const tokens = useAppDesignTokens();
 
   const styles = StyleSheet.create({
-    container: { padding: 16 },
-    title: {
-      fontSize: 18,
-      fontWeight: "bold",
-      color: tokens.colors.textPrimary,
-      marginBottom: 16,
-    },
-    grid: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      gap: 12,
-    },
+    container: { padding: tokens.spacing.md, gap: tokens.spacing.md },
+    grid: { flexDirection: "row", flexWrap: "wrap", gap: tokens.spacing.sm },
     filter: {
-      width: 80,
-      height: 80,
-      borderRadius: 12,
+      width: 75,
+      height: 75,
+      borderRadius: tokens.borders.radius.md,
       backgroundColor: tokens.colors.surfaceVariant,
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 2,
       borderColor: "transparent",
     },
-    filterActive: {
+    active: {
       borderColor: tokens.colors.primary,
-      backgroundColor: tokens.colors.primaryContainer,
+      backgroundColor: tokens.colors.primary + "10",
     },
-    filterName: {
-      marginTop: 4,
-      fontSize: 12,
-      color: tokens.colors.textSecondary,
-    },
-    filterNameActive: { color: tokens.colors.primary },
   });
 
   return (
     <View style={styles.container}>
-      <AtomicText style={styles.title}>Filters</AtomicText>
+      <AtomicText type="headlineSmall">Filters</AtomicText>
       <View style={styles.grid}>
-        {filters.map((filter) => (
+        {filters.map((f) => (
           <TouchableOpacity
-            key={filter.id}
-            style={[
-              styles.filter,
-              selectedFilter === filter.id && styles.filterActive,
-            ]}
-            onPress={() => onSelectFilter(filter.id, filter.value)}
+            key={f.id}
+            style={[styles.filter, selectedFilter === f.id && styles.active]}
+            onPress={() => onSelectFilter(f.id, f.value)}
           >
             <AtomicIcon
-              name={filter.icon as "close-circle" | "color-palette" | "contrast" | "time" | "sunny" | "snow"}
+              name={f.icon as "close-circle" | "color-palette" | "contrast" | "time" | "sunny" | "snow"}
               size="lg"
-              color={selectedFilter === filter.id ? "primary" : "textSecondary"}
+              color={selectedFilter === f.id ? "primary" : "textSecondary"}
             />
             <AtomicText
-              style={[
-                styles.filterName,
-                selectedFilter === filter.id && styles.filterNameActive,
-              ]}
+              type="labelSmall"
+              color={selectedFilter === f.id ? "primary" : "textSecondary"}
             >
-              {filter.name}
+              {f.name}
             </AtomicText>
           </TouchableOpacity>
         ))}

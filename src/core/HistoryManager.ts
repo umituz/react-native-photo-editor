@@ -72,4 +72,4 @@ export class HistoryManager<T> {
   }
 }
 
-export const historyManager = new HistoryManager();
+

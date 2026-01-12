@@ -1,10 +1,6 @@
 import React from "react";
 import { View, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
-import {
-  AtomicText,
-  AtomicIcon,
-  useAppDesignTokens,
-} from "@umituz/react-native-design-system";
+import { AtomicText, AtomicIcon, useAppDesignTokens } from "@umituz/react-native-design-system";
 import { Layer, TextLayer } from "../types";
 
 interface LayerManagerProps {
@@ -25,58 +21,37 @@ export const LayerManager: React.FC<LayerManagerProps> = ({
   const tokens = useAppDesignTokens();
 
   const styles = StyleSheet.create({
-    container: { padding: 16 },
-    title: {
-      fontSize: 18,
-      fontWeight: "bold",
-      color: tokens.colors.textPrimary,
-      marginBottom: 16,
-    },
-    emptyText: {
-      color: tokens.colors.textSecondary,
-      textAlign: "center",
-      padding: 24,
-    },
-    layerItem: {
+    container: { padding: tokens.spacing.md, gap: tokens.spacing.md },
+    item: {
       flexDirection: "row",
       alignItems: "center",
-      padding: 12,
+      padding: tokens.spacing.md,
       backgroundColor: tokens.colors.surfaceVariant,
-      borderRadius: 12,
-      marginBottom: 8,
+      borderRadius: tokens.borders.radius.md,
+      marginBottom: tokens.spacing.xs,
       borderWidth: 2,
       borderColor: "transparent",
     },
-    layerItemActive: {
+    active: {
       borderColor: tokens.colors.primary,
-      backgroundColor: tokens.colors.primaryContainer,
+      backgroundColor: tokens.colors.primary + "10",
     },
-    layerInfo: { flex: 1, marginLeft: 12 },
-    layerType: { fontSize: 12, color: tokens.colors.textSecondary },
-    layerText: {
-      fontSize: 14,
-      color: tokens.colors.textPrimary,
-      fontWeight: "500",
-    },
-    deleteButton: { padding: 8 },
+    info: { flex: 1, marginLeft: tokens.spacing.sm },
   });
 
   return (
     <View style={styles.container}>
-      <AtomicText style={styles.title}>Layers</AtomicText>
-      {layers.length === 0 ? (
-        <AtomicText style={styles.emptyText}>
-          No layers yet. Add text or stickers!
-        </AtomicText>
-      ) : (
-        <ScrollView showsVerticalScrollIndicator={false}>
-          {layers.map((layer) => (
+      <AtomicText type="headlineSmall">Layers</AtomicText>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {layers.length === 0 ? (
+          <AtomicText color="textSecondary" style={{ textAlign: "center", padding: tokens.spacing.xl }}>
+            No layers yet
+          </AtomicText>
+        ) : (
+          layers.map((layer) => (
             <TouchableOpacity
               key={layer.id}
-              style={[
-                styles.layerItem,
-                activeLayerId === layer.id && styles.layerItemActive,
-              ]}
+              style={[styles.item, activeLayerId === layer.id && styles.active]}
               onPress={() => onSelectLayer(layer.id)}
             >
               <AtomicIcon
@@ -84,28 +59,21 @@ export const LayerManager: React.FC<LayerManagerProps> = ({
                 size="md"
                 color={activeLayerId === layer.id ? "primary" : "textSecondary"}
               />
-              <View style={styles.layerInfo}>
-                <AtomicText style={styles.layerType}>
-                  {layer.type === "text" ? "Text" : "Sticker"}
+              <View style={styles.info}>
+                <AtomicText type="labelSmall" color="textSecondary">
+                  {layer.type.toUpperCase()}
                 </AtomicText>
-                <AtomicText style={styles.layerText} numberOfLines={1}>
-                  {layer.type === "text"
-                    ? (layer as TextLayer).text || t("editor.untitled")
-                    : "Emoji"}
+                <AtomicText fontWeight="bold" numberOfLines={1}>
+                  {layer.type === "text" ? (layer as TextLayer).text || t("editor.untitled") : "Sticker"}
                 </AtomicText>
               </View>
-              {layers.length > 1 && (
-                <TouchableOpacity
-                  style={styles.deleteButton}
-                  onPress={() => onDeleteLayer(layer.id)}
-                >
-                  <AtomicIcon name="trash" size="sm" color="error" />
-                </TouchableOpacity>
-              )}
+              <TouchableOpacity onPress={() => onDeleteLayer(layer.id)} style={{ padding: tokens.spacing.xs }}>
+                <AtomicIcon name="trash" size="sm" color="error" />
+              </TouchableOpacity>
             </TouchableOpacity>
-          ))}
-        </ScrollView>
-      )}
+          ))
+        )}
+      </ScrollView>
     </View>
   );
 };

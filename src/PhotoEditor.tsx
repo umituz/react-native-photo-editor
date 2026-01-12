@@ -13,10 +13,11 @@ import {
 import { EditorCanvas } from "./components/EditorCanvas";
 import { EditorToolbar } from "./components/EditorToolbar";
 import { FontControls } from "./components/FontControls";
-import { StickerPicker } from "./components/StickerPicker";
-import { FilterPicker } from "./components/FilterPicker";
 import { LayerManager } from "./components/LayerManager";
 import { TextEditorSheet } from "./components/TextEditorSheet";
+import { StickerPicker } from "./components/StickerPicker";
+import { FilterPicker } from "./components/FilterPicker";
+import { AIMagicSheet } from "./components/AIMagicSheet";
 import { createEditorStyles } from "./styles";
 import { usePhotoEditorUI } from "./hooks/usePhotoEditorUI";
 import { Layer } from "./types";
@@ -38,7 +39,6 @@ export interface PhotoEditorProps {
   initialCaption?: string;
   t: (key: string) => string;
   fonts?: readonly string[];
-  stickers?: readonly string[];
   showAI?: boolean;
 }
 
@@ -51,124 +51,42 @@ export const PhotoEditor: React.FC<PhotoEditorProps> = ({
   initialCaption,
   t,
   fonts = DEFAULT_FONTS,
-  stickers,
-  showAI = false,
+  showAI = true,
 }) => {
   const tokens = useAppDesignTokens();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createEditorStyles(tokens, insets), [tokens, insets]);
+  const ui = usePhotoEditorUI(initialCaption, tokens);
 
-  const {
-    // Refs
-    textEditorSheetRef,
-    stickerSheetRef,
-    filterSheetRef,
-    layerSheetRef,
-    // State
-    selectedFont,
-    setSelectedFont,
-    fontSize,
-    setFontSize,
-    editingText,
-    setEditingText,
-    selectedFilter,
-    // Domain State
-    layers,
-    activeLayerId,
-    // Actions
-    updateLayer,
-    deleteLayer,
-    selectLayer,
-    addTextLayer,
-    handleAddText,
-    handleTextLayerTap,
-    handleSaveText,
-    handleSelectFilter,
-    handleSelectSticker,
-  } = usePhotoEditorUI(initialCaption, tokens);
+  const actions: EditorActions = useMemo(() => ({
+    addTextLayer: ui.addTextLayer,
+    updateLayer: ui.updateLayer,
+    getLayers: () => ui.layers,
+    getActiveLayerId: () => ui.activeLayerId,
+  }), [ui.addTextLayer, ui.updateLayer, ui.layers, ui.activeLayerId]);
 
   return (
     <SafeBottomSheetModalProvider>
       <View style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity style={styles.headerButton} onPress={onClose}>
-            <AtomicIcon name="close" size="md" color="textPrimary" />
-          </TouchableOpacity>
-          <AtomicText style={styles.headerTitle}>{title}</AtomicText>
-          <TouchableOpacity style={styles.postButton} onPress={() => onSave?.(imageUri)}>
-            <AtomicText style={styles.postButtonText}>{t("preview.share") || "Share"}</AtomicText>
-          </TouchableOpacity>
+          <TouchableOpacity onPress={onClose}><AtomicIcon name="close" size="md" color="textPrimary" /></TouchableOpacity>
+          <AtomicText type="headlineSmall" style={styles.headerTitle}>{title}</AtomicText>
+          <TouchableOpacity onPress={() => onSave?.(imageUri)}><AtomicText fontWeight="bold" color="primary">{t("common.save")}</AtomicText></TouchableOpacity>
         </View>
 
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          <EditorCanvas
-            imageUrl={imageUri}
-            layers={layers}
-            activeLayerId={activeLayerId}
-            onLayerTap={handleTextLayerTap}
-            onLayerMove={(id, x, y) => updateLayer(id, { x, y })}
-            styles={styles}
-          />
-          {typeof customTools === "function"
-            ? customTools({
-                addTextLayer,
-                updateLayer,
-                getLayers: () => layers,
-                getActiveLayerId: () => activeLayerId,
-              })
-            : customTools}
-          <FontControls
-            fontSize={fontSize}
-            selectedFont={selectedFont}
-            fonts={fonts}
-            onFontSizeChange={(s) => setFontSize(Math.max(12, Math.min(96, s)))}
-            onFontSelect={setSelectedFont}
-            styles={styles}
-          />
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <EditorCanvas imageUrl={imageUri} layers={ui.layers} activeLayerId={ui.activeLayerId} onLayerTap={ui.handleTextLayerTap} onLayerMove={(id, x, y) => ui.updateLayer(id, { x, y })} styles={styles} />
+          {typeof customTools === "function" ? customTools(actions) : customTools}
+          <FontControls fontSize={ui.fontSize} selectedFont={ui.selectedFont} fonts={fonts} onFontSizeChange={ui.setFontSize} onFontSelect={ui.setSelectedFont} styles={styles} />
         </ScrollView>
 
-        <EditorToolbar
-          onAddText={handleAddText}
-          onAddSticker={() => stickerSheetRef.current?.present()}
-          onOpenFilters={() => filterSheetRef.current?.present()}
-          onOpenLayers={() => layerSheetRef.current?.present()}
-          onAIMagic={showAI ? undefined : undefined}
-          styles={styles}
-          t={t}
-        />
+        <EditorToolbar onAddText={ui.handleAddText} onAddSticker={() => ui.stickerSheetRef.current?.present()} onOpenFilters={() => ui.filterSheetRef.current?.present()} onOpenLayers={() => ui.layerSheetRef.current?.present()} onAIMagic={showAI ? () => ui.aiSheetRef.current?.present() : undefined} styles={styles} t={t} />
 
-        <BottomSheetModal ref={textEditorSheetRef} snapPoints={["40%"]}>
-          <TextEditorSheet
-            value={editingText}
-            onChange={setEditingText}
-            onSave={handleSaveText}
-            t={t}
-          />
-        </BottomSheetModal>
-
-        <BottomSheetModal ref={stickerSheetRef} snapPoints={["50%"]}>
-          <StickerPicker stickers={stickers} onSelectSticker={handleSelectSticker} />
-        </BottomSheetModal>
-
-        <BottomSheetModal ref={filterSheetRef} snapPoints={["40%"]}>
-          <FilterPicker selectedFilter={selectedFilter} onSelectFilter={handleSelectFilter} />
-        </BottomSheetModal>
-
-        <BottomSheetModal ref={layerSheetRef} snapPoints={["50%"]}>
-          <LayerManager
-            layers={layers}
-            activeLayerId={activeLayerId}
-            onSelectLayer={(id) => {
-              selectLayer(id);
-              layerSheetRef.current?.dismiss();
-            }}
-            onDeleteLayer={deleteLayer}
-            t={t}
-          />
-        </BottomSheetModal>
+        <BottomSheetModal ref={ui.textEditorSheetRef} snapPoints={["40%"]}><TextEditorSheet value={ui.editingText} onChange={ui.setEditingText} onSave={ui.handleSaveText} t={t} /></BottomSheetModal>
+        <BottomSheetModal ref={ui.stickerSheetRef} snapPoints={["50%"]}><StickerPicker onSelectSticker={ui.handleSelectSticker} /></BottomSheetModal>
+        <BottomSheetModal ref={ui.filterSheetRef} snapPoints={["40%"]}><FilterPicker selectedFilter={ui.selectedFilter} onSelectFilter={ui.handleSelectFilter} /></BottomSheetModal>
+        <BottomSheetModal ref={ui.layerSheetRef} snapPoints={["50%"]}><LayerManager layers={ui.layers} activeLayerId={ui.activeLayerId} onSelectLayer={ui.selectLayer} onDeleteLayer={ui.deleteLayer} t={t} /></BottomSheetModal>
+        <BottomSheetModal ref={ui.aiSheetRef} snapPoints={["60%"]}><AIMagicSheet onGenerateCaption={(_s) => { ui.aiSheetRef.current?.dismiss(); /* AI trigger */ }} /></BottomSheetModal>
       </View>
     </SafeBottomSheetModalProvider>
   );

@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   useAnimatedStyle,
@@ -10,25 +10,24 @@ import {
   AtomicText,
   useAppDesignTokens,
 } from "@umituz/react-native-design-system";
-import { TextAlign } from "../types";
 
 interface DraggableTextProps {
   text: string;
   color: string;
   fontSize?: number;
   fontFamily?: string;
-  textAlign?: TextAlign;
-  rotation?: number;
-  scale?: number;
-  opacity?: number;
-  backgroundColor?: string;
-  _strokeColor?: string;
-  _strokeWidth?: number;
   initialX: number;
   initialY: number;
   onDragEnd: (x: number, y: number) => void;
   onPress: () => void;
   isSelected?: boolean;
+  rotation?: number;
+  scale?: number;
+  opacity?: number;
+  textAlign?: "center" | "left" | "right";
+  backgroundColor?: string;
+  _strokeColor?: string;
+  _strokeWidth?: number;
 }
 
 export const DraggableText: React.FC<DraggableTextProps> = ({
@@ -36,26 +35,23 @@ export const DraggableText: React.FC<DraggableTextProps> = ({
   color,
   fontSize = 24,
   fontFamily = "System",
-  textAlign = "center",
-  rotation = 0,
-  scale = 1,
-  opacity = 1,
-  backgroundColor = "transparent",
-  _strokeColor,
-  _strokeWidth = 2,
   initialX,
   initialY,
   onDragEnd,
   onPress,
   isSelected,
+  rotation = 0,
+  scale = 1,
+  opacity = 1,
+  textAlign = "center",
+  backgroundColor = "transparent",
 }) => {
   const tokens = useAppDesignTokens();
   const translateX = useSharedValue(initialX);
   const translateY = useSharedValue(initialY);
-  const offset = useSharedValue({ x: 0, y: 0 });
+  const offset = useSharedValue({ x: initialX, y: initialY });
 
-  const drag = Gesture.Pan()
-    .minDistance(5)
+  const panGesture = Gesture.Pan()
     .onStart(() => {
       offset.value = { x: translateX.value, y: translateY.value };
     })
@@ -67,77 +63,47 @@ export const DraggableText: React.FC<DraggableTextProps> = ({
       runOnJS(onDragEnd)(translateX.value, translateY.value);
     });
 
-  const tap = Gesture.Tap()
-    .maxDistance(5)
-    .onEnd(() => {
-      runOnJS(onPress)();
-    });
-
-  const gesture = Gesture.Exclusive(drag, tap);
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { translateX: translateX.value },
-        { translateY: translateY.value },
-        { rotate: `${rotation}deg` },
-        { scale: scale },
-      ],
-      opacity: opacity,
-      zIndex: isSelected ? 100 : 10,
-    };
+  const tapGesture = Gesture.Tap().onEnd(() => {
+    runOnJS(onPress)();
   });
 
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: translateX.value },
+      { translateY: translateY.value },
+      { rotate: `${rotation}deg` },
+      { scale },
+    ],
+    opacity,
+    zIndex: isSelected ? 100 : 10,
+  }));
+
   return (
-    <GestureDetector gesture={gesture}>
-      <Animated.View
-        style={[
-          styles.container,
-          animatedStyle,
-          { position: "absolute", left: 0, top: 0 },
-        ]}
-      >
+    <GestureDetector gesture={Gesture.Exclusive(panGesture, tapGesture)}>
+      <Animated.View style={[animatedStyle, { position: "absolute" }]}>
         <View
-          style={[
-            {
-              backgroundColor: backgroundColor,
-              paddingHorizontal: 8,
-              paddingVertical: 4,
-              borderRadius: 4,
-            },
-            isSelected && {
-              borderWidth: 2,
-              borderColor: tokens.colors.primary,
-              borderStyle: "dashed",
-              backgroundColor:
-                backgroundColor === "transparent"
-                  ? `${tokens.colors.primary}10`
-                  : backgroundColor,
-            },
-          ]}
+          style={{
+            padding: tokens.spacing.xs,
+            borderRadius: tokens.borders.radius.sm,
+            borderWidth: isSelected ? 2 : 0,
+            borderColor: tokens.colors.primary,
+            borderStyle: "dashed",
+            backgroundColor: isSelected ? tokens.colors.primary + "10" : backgroundColor,
+          }}
         >
           <AtomicText
+            fontWeight="900"
             style={{
-              fontSize: fontSize,
-              fontFamily: fontFamily,
-              fontWeight: "900",
-              textAlign: textAlign,
-              textTransform: "uppercase",
-              color: color,
-              minWidth: text ? undefined : 100,
-              minHeight: text ? undefined : 40,
+              fontSize,
+              fontFamily,
+              color,
+              textAlign,
             }}
           >
-            {text}
+            {text || "TAP TO EDIT"}
           </AtomicText>
         </View>
       </Animated.View>
     </GestureDetector>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    zIndex: 10,
-  },
-});
