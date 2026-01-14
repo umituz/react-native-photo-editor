@@ -1,6 +1,6 @@
 {
   "name": "@umituz/react-native-photo-editor",
-  "version": "1.0.12",
+  "version": "1.1.0",
   "description": "A powerful, generic photo editor for React Native",
   "main": "src/index.ts",
   "types": "src/index.ts",
@@ -23,7 +23,6 @@
     "react-native": "*",
     "@umituz/react-native-design-system": "*",
     "react-native-gesture-handler": "*",
-    "react-native-reanimated": "*",
     "react-native-safe-area-context": "*"
   },
   "dependencies": {
@@ -40,7 +39,6 @@
     "eslint": "*",
     "typescript": "*",
     "react-native-gesture-handler": "*",
-    "react-native-reanimated": "*",
     "react-native-safe-area-context": "*",
     "expo-application": "*",
     "expo-device": "*"

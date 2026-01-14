@@ -1,11 +1,6 @@
-import React from "react";
-import { View } from "react-native";
+import React, { useState, useRef, useCallback } from "react";
+import { View, StyleSheet } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  runOnJS,
-} from "react-native-reanimated";
 import {
   AtomicText,
   useAppDesignTokens,
@@ -35,42 +30,50 @@ export const DraggableSticker: React.FC<DraggableStickerProps> = ({
   opacity = 1,
 }) => {
   const tokens = useAppDesignTokens();
-  const translateX = useSharedValue(initialX);
-  const translateY = useSharedValue(initialY);
-  const offset = useSharedValue({ x: initialX, y: initialY });
+  const [position, setPosition] = useState({ x: initialX, y: initialY });
+  const offsetRef = useRef({ x: initialX, y: initialY });
+
+  const handleDragEnd = useCallback(() => {
+    onDragEnd(position.x, position.y);
+  }, [position.x, position.y, onDragEnd]);
 
   const panGesture = Gesture.Pan()
     .onStart(() => {
-      offset.value = { x: translateX.value, y: translateY.value };
+      offsetRef.current = { x: position.x, y: position.y };
     })
     .onUpdate((event) => {
-      translateX.value = offset.value.x + event.translationX;
-      translateY.value = offset.value.y + event.translationY;
+      setPosition({
+        x: offsetRef.current.x + event.translationX,
+        y: offsetRef.current.y + event.translationY,
+      });
     })
     .onEnd(() => {
-      runOnJS(onDragEnd)(translateX.value, translateY.value);
+      handleDragEnd();
     });
 
   const tapGesture = Gesture.Tap().onEnd(() => {
-    runOnJS(onPress)();
+    onPress();
   });
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: translateX.value },
-      { translateY: translateY.value },
-      { rotate: `${rotation}deg` },
-      { scale },
-    ],
-    opacity,
-    zIndex: isSelected ? 100 : 50,
-  }));
 
   const isEmoji = uri.length <= 4 && !uri.startsWith("http");
 
   return (
     <GestureDetector gesture={Gesture.Exclusive(panGesture, tapGesture)}>
-      <Animated.View style={[animatedStyle, { position: "absolute" }]}>
+      <View
+        style={[
+          styles.container,
+          {
+            transform: [
+              { translateX: position.x },
+              { translateY: position.y },
+              { rotate: `${rotation}deg` },
+              { scale },
+            ],
+            opacity,
+            zIndex: isSelected ? 100 : 50,
+          },
+        ]}
+      >
         <View
           style={{
             padding: tokens.spacing.xs,
@@ -85,7 +88,13 @@ export const DraggableSticker: React.FC<DraggableStickerProps> = ({
             <AtomicText style={{ fontSize: 48 }}>{uri}</AtomicText>
           ) : null}
         </View>
-      </Animated.View>
+      </View>
     </GestureDetector>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    position: "absolute",
+  },
+});
