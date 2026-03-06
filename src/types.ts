@@ -10,7 +10,16 @@ export interface ImageFilters {
   saturation: number;
   sepia: number;
   grayscale: number;
+  hueRotate?: number; // 0-360 degrees
 }
+
+export const DEFAULT_IMAGE_FILTERS: ImageFilters = {
+  brightness: 1,
+  contrast: 1,
+  saturation: 1,
+  sepia: 0,
+  grayscale: 0,
+};
 
 export interface BaseLayer {
   id: string;
@@ -20,7 +29,7 @@ export interface BaseLayer {
   scale: number;
   opacity: number;
   zIndex: number;
-  type: "text" | "sticker" | "image";
+  type: "text" | "sticker";
 }
 
 export interface TextLayer extends BaseLayer {
@@ -31,6 +40,8 @@ export interface TextLayer extends BaseLayer {
   color: string;
   backgroundColor: string;
   textAlign: TextAlign;
+  isBold?: boolean;
+  isItalic?: boolean;
   strokeColor?: string;
   strokeWidth?: number;
 }

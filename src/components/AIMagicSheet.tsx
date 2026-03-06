@@ -1,20 +1,17 @@
 import React, { useState } from "react";
 import { View, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
-import { AtomicText, AtomicIcon, useAppDesignTokens, AtomicButton } from "@umituz/react-native-design-system";
+import { AtomicText, AtomicIcon, AtomicButton } from "@umituz/react-native-design-system/atoms";
+import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
+import { DEFAULT_AI_STYLES } from "../constants";
 
 interface AIMagicSheetProps {
-  onGenerateCaption: (style: string) => void;
+  /**
+   * Called with the selected style ID. Should return a generated caption string.
+   * If undefined, the AI button is disabled.
+   */
+  onGenerateCaption?: (style: string) => Promise<string> | void;
   isLoading?: boolean;
 }
-
-const AI_STYLES = [
-  { id: "viral", label: "✨ Viral", desc: "Catchy & shareable" },
-  { id: "funny", label: "😂 Funny", desc: "Humor that connects" },
-  { id: "savage", label: "🔥 Savage", desc: "Bold & edgy" },
-  { id: "wholesome", label: "💕 Wholesome", desc: "Warm & positive" },
-  { id: "sarcastic", label: "😏 Sarcastic", desc: "Witty & ironic" },
-  { id: "relatable", label: "🎯 Relatable", desc: "Everyone gets it" },
-];
 
 export const AIMagicSheet: React.FC<AIMagicSheetProps> = ({
   onGenerateCaption,
@@ -22,6 +19,7 @@ export const AIMagicSheet: React.FC<AIMagicSheetProps> = ({
 }) => {
   const tokens = useAppDesignTokens();
   const [selected, setSelected] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const styles = StyleSheet.create({
     container: { padding: tokens.spacing.md, gap: tokens.spacing.md },
@@ -43,6 +41,18 @@ export const AIMagicSheet: React.FC<AIMagicSheetProps> = ({
     info: { flex: 1, marginLeft: tokens.spacing.sm },
   });
 
+  const handleGenerate = async () => {
+    if (!selected || !onGenerateCaption) return;
+    setLoading(true);
+    try {
+      await onGenerateCaption(selected);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const isGenerating = isLoading || loading;
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -51,29 +61,43 @@ export const AIMagicSheet: React.FC<AIMagicSheetProps> = ({
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.grid}>
-          {AI_STYLES.map((style) => (
-            <TouchableOpacity
-              key={style.id}
-              style={[styles.card, selected === style.id && styles.cardActive]}
-              onPress={() => setSelected(style.id)}
-            >
-              <AtomicText style={{ fontSize: 24 }}>{style.label.split(" ")[0]}</AtomicText>
-              <View style={styles.info}>
-                <AtomicText fontWeight="bold" color={selected === style.id ? "primary" : "textPrimary"}>
-                  {style.label.split(" ").slice(1).join(" ")}
-                </AtomicText>
-                <AtomicText type="labelSmall" color="textSecondary">{style.desc}</AtomicText>
-              </View>
-              {selected === style.id && <AtomicIcon name="checkmark-circle" size="md" color="primary" />}
-            </TouchableOpacity>
-          ))}
+          {DEFAULT_AI_STYLES.map((style) => {
+            const isActive = selected === style.id;
+            const [emoji, ...words] = style.label.split(" ");
+            return (
+              <TouchableOpacity
+                key={style.id}
+                style={[styles.card, isActive && styles.cardActive]}
+                onPress={() => setSelected(style.id)}
+                accessibilityLabel={style.label}
+                accessibilityRole="button"
+                accessibilityState={{ selected: isActive }}
+              >
+                <AtomicText style={{ fontSize: 24 }}>{emoji}</AtomicText>
+                <View style={styles.info}>
+                  <AtomicText
+                    fontWeight="bold"
+                    color={isActive ? "primary" : "textPrimary"}
+                  >
+                    {words.join(" ")}
+                  </AtomicText>
+                  <AtomicText type="labelSmall" color="textSecondary">
+                    {style.desc}
+                  </AtomicText>
+                </View>
+                {isActive && (
+                  <AtomicIcon name="checkmark-circle" size="md" color="primary" />
+                )}
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </ScrollView>
       <AtomicButton
         variant="primary"
-        disabled={!selected || isLoading}
-        onPress={() => selected && onGenerateCaption(selected)}
-        loading={isLoading}
+        disabled={!selected || !onGenerateCaption || isGenerating}
+        onPress={handleGenerate}
+        loading={isGenerating}
         icon="sparkles"
       >
         Generate Caption

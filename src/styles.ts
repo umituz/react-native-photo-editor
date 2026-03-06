@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { DesignTokens } from "@umituz/react-native-design-system";
+import { DesignTokens } from "@umituz/react-native-design-system/theme";
 import { EdgeInsets } from "react-native-safe-area-context";
 
 export const createEditorStyles = (tokens: DesignTokens, insets: EdgeInsets) =>
@@ -18,8 +18,8 @@ export const createEditorStyles = (tokens: DesignTokens, insets: EdgeInsets) =>
       flex: 1,
       textAlign: "center",
     },
-    scrollContent: { 
-      paddingHorizontal: tokens.spacing.md, 
+    scrollContent: {
+      paddingHorizontal: tokens.spacing.md,
       paddingBottom: 120,
       gap: tokens.spacing.lg,
     },
@@ -37,8 +37,18 @@ export const createEditorStyles = (tokens: DesignTokens, insets: EdgeInsets) =>
       borderRadius: tokens.borders.radius.md,
       gap: tokens.spacing.md,
     },
-    fontRow: { 
-      flexDirection: "row", 
+    sliderRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    sliderLabel: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: tokens.spacing.xs,
+    },
+    fontRow: {
+      flexDirection: "row",
       gap: tokens.spacing.sm,
       flexWrap: "wrap",
     },
@@ -74,7 +84,15 @@ export const createEditorStyles = (tokens: DesignTokens, insets: EdgeInsets) =>
       padding: tokens.spacing.sm,
       borderRadius: 999,
     },
-    toolButtonActive: { 
+    toolButtonActive: {
       backgroundColor: tokens.colors.primary + "20",
+    },
+    aiMagicButton: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: tokens.colors.primary,
+      alignItems: "center",
+      justifyContent: "center",
     },
   });

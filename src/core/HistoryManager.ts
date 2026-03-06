@@ -9,57 +9,37 @@ export interface HistoryState<T> {
 }
 
 export class HistoryManager<T> {
-  private maxHistory = 20;
+  private readonly maxHistory = 20;
 
   createInitialState(initialValue: T): HistoryState<T> {
-    return {
-      past: [],
-      present: initialValue,
-      future: [],
-    };
+    return { past: [], present: initialValue, future: [] };
   }
 
   push(history: HistoryState<T>, newValue: T): HistoryState<T> {
-    const { past, present } = history;
-
     return {
-      past: [...past.slice(-this.maxHistory + 1), present],
+      past: [...history.past.slice(-this.maxHistory + 1), history.present],
       present: newValue,
       future: [],
     };
   }
 
   undo(history: HistoryState<T>): HistoryState<T> {
-    const { past, present, future } = history;
-
-    if (past.length === 0) {
-      return history;
-    }
-
-    const previous = past[past.length - 1];
-    const newPast = past.slice(0, past.length - 1);
-
+    if (history.past.length === 0) return history;
+    const previous = history.past[history.past.length - 1];
     return {
-      past: newPast,
+      past: history.past.slice(0, -1),
       present: previous,
-      future: [present, ...future],
+      future: [history.present, ...history.future],
     };
   }
 
   redo(history: HistoryState<T>): HistoryState<T> {
-    const { past, present, future } = history;
-
-    if (future.length === 0) {
-      return history;
-    }
-
-    const next = future[0];
-    const newFuture = future.slice(1);
-
+    if (history.future.length === 0) return history;
+    const next = history.future[0];
     return {
-      past: [...past, present],
+      past: [...history.past, history.present],
       present: next,
-      future: newFuture,
+      future: history.future.slice(1),
     };
   }
 
@@ -71,5 +51,3 @@ export class HistoryManager<T> {
     return history.future.length > 0;
   }
 }
-
-

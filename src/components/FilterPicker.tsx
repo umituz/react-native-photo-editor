@@ -1,12 +1,13 @@
 import React from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
-import { AtomicText, AtomicIcon, useAppDesignTokens } from "@umituz/react-native-design-system";
+import { AtomicText, AtomicIcon } from "@umituz/react-native-design-system/atoms";
+import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
 import { DEFAULT_FILTERS, type FilterOption } from "../constants";
 
 interface FilterPickerProps {
   selectedFilter: string;
-  onSelectFilter: (filterId: string, value: number) => void;
-  filters?: readonly FilterOption[];
+  onSelectFilter: (option: FilterOption) => void;
+  filters?: FilterOption[];
 }
 
 export const FilterPicker: React.FC<FilterPickerProps> = ({
@@ -39,25 +40,31 @@ export const FilterPicker: React.FC<FilterPickerProps> = ({
     <View style={styles.container}>
       <AtomicText type="headlineSmall">Filters</AtomicText>
       <View style={styles.grid}>
-        {filters.map((f) => (
-          <TouchableOpacity
-            key={f.id}
-            style={[styles.filter, selectedFilter === f.id && styles.active]}
-            onPress={() => onSelectFilter(f.id, f.value)}
-          >
-            <AtomicIcon
-              name={f.icon as "close-circle" | "color-palette" | "contrast" | "time" | "sunny" | "snow"}
-              size="lg"
-              color={selectedFilter === f.id ? "primary" : "textSecondary"}
-            />
-            <AtomicText
-              type="labelSmall"
-              color={selectedFilter === f.id ? "primary" : "textSecondary"}
+        {filters.map((f) => {
+          const isActive = selectedFilter === f.id;
+          return (
+            <TouchableOpacity
+              key={f.id}
+              style={[styles.filter, isActive && styles.active]}
+              onPress={() => onSelectFilter(f)}
+              accessibilityLabel={f.name}
+              accessibilityRole="button"
+              accessibilityState={{ selected: isActive }}
             >
-              {f.name}
-            </AtomicText>
-          </TouchableOpacity>
-        ))}
+              <AtomicIcon
+                name={f.icon as "close"}
+                size="lg"
+                color={isActive ? "primary" : "textSecondary"}
+              />
+              <AtomicText
+                type="labelSmall"
+                color={isActive ? "primary" : "textSecondary"}
+              >
+                {f.name}
+              </AtomicText>
+            </TouchableOpacity>
+          );
+        })}
       </View>
     </View>
   );

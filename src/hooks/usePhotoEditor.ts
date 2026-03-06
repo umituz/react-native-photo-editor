@@ -1,15 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
-import { DesignTokens } from "@umituz/react-native-design-system";
-import { Layer, TextLayer, StickerLayer, ImageFilters } from "../types";
+import { Layer, TextLayer, StickerLayer, ImageFilters, DEFAULT_IMAGE_FILTERS } from "../types";
 import { HistoryManager, HistoryState } from "../core/HistoryManager";
-
-const DEFAULT_FILTERS: ImageFilters = {
-  brightness: 1,
-  contrast: 1,
-  saturation: 1,
-  sepia: 0,
-  grayscale: 0,
-};
 
 export const usePhotoEditor = (initialLayers: Layer[] = []) => {
   const historyManager = useMemo(() => new HistoryManager<Layer[]>(), []);
@@ -17,18 +8,24 @@ export const usePhotoEditor = (initialLayers: Layer[] = []) => {
     historyManager.createInitialState(initialLayers),
   );
   const [activeLayerId, setActiveLayerId] = useState<string | null>(
-    initialLayers[0]?.id || null,
+    initialLayers[0]?.id ?? null,
   );
-  const [filters, setFilters] = useState<ImageFilters>(DEFAULT_FILTERS);
+  const [filters, setFilters] = useState<ImageFilters>(DEFAULT_IMAGE_FILTERS);
 
   const layers = history.present;
 
-  const pushState = useCallback((newLayers: Layer[]) => {
-    setHistory((prev) => historyManager.push(prev, newLayers));
-  }, [historyManager]);
+  const pushState = useCallback(
+    (newLayers: Layer[]) => {
+      setHistory((prev) => historyManager.push(prev, newLayers));
+    },
+    [historyManager],
+  );
 
   const addTextLayer = useCallback(
-    (tokens: DesignTokens) => {
+    (
+      defaultColor = "#FFFFFF",
+      overrides: Partial<Omit<TextLayer, "id" | "type">> = {},
+    ) => {
       const id = `text-${Date.now()}`;
       const newLayer: TextLayer = {
         id,
@@ -42,9 +39,10 @@ export const usePhotoEditor = (initialLayers: Layer[] = []) => {
         zIndex: layers.length,
         fontSize: 32,
         fontFamily: "System",
-        color: tokens.colors.textPrimary,
+        color: defaultColor,
         backgroundColor: "transparent",
         textAlign: "center",
+        ...overrides,
       };
       pushState([...layers, newLayer]);
       setActiveLayerId(id);
@@ -76,7 +74,9 @@ export const usePhotoEditor = (initialLayers: Layer[] = []) => {
 
   const updateLayer = useCallback(
     (id: string, updates: Partial<Layer>) => {
-      const newLayers = layers.map((l) => (l.id === id ? { ...l, ...updates } : l) as Layer);
+      const newLayers = layers.map(
+        (l) => (l.id === id ? ({ ...l, ...updates } as Layer) : l),
+      );
       pushState(newLayers);
     },
     [layers, pushState],
@@ -86,9 +86,58 @@ export const usePhotoEditor = (initialLayers: Layer[] = []) => {
     (id: string) => {
       const newLayers = layers.filter((l) => l.id !== id);
       pushState(newLayers);
-      if (activeLayerId === id) setActiveLayerId(newLayers[0]?.id || null);
+      if (activeLayerId === id) {
+        setActiveLayerId(newLayers[0]?.id ?? null);
+      }
     },
     [layers, activeLayerId, pushState],
+  );
+
+  const duplicateLayer = useCallback(
+    (id: string) => {
+      const layer = layers.find((l) => l.id === id);
+      if (!layer) return null;
+      const newId = `${layer.type}-${Date.now()}`;
+      const newLayer = { ...layer, id: newId, x: layer.x + 20, y: layer.y + 20, zIndex: layers.length };
+      pushState([...layers, newLayer]);
+      setActiveLayerId(newId);
+      return newId;
+    },
+    [layers, pushState],
+  );
+
+  const moveLayerUp = useCallback(
+    (id: string) => {
+      const sorted = [...layers].sort((a, b) => a.zIndex - b.zIndex);
+      const idx = sorted.findIndex((l) => l.id === id);
+      if (idx >= sorted.length - 1) return;
+      const reordered = [...sorted];
+      [reordered[idx], reordered[idx + 1]] = [reordered[idx + 1], reordered[idx]];
+      pushState(reordered.map((l, i) => ({ ...l, zIndex: i })));
+    },
+    [layers, pushState],
+  );
+
+  const moveLayerDown = useCallback(
+    (id: string) => {
+      const sorted = [...layers].sort((a, b) => a.zIndex - b.zIndex);
+      const idx = sorted.findIndex((l) => l.id === id);
+      if (idx <= 0) return;
+      const reordered = [...sorted];
+      [reordered[idx], reordered[idx - 1]] = [reordered[idx - 1], reordered[idx]];
+      pushState(reordered.map((l, i) => ({ ...l, zIndex: i })));
+    },
+    [layers, pushState],
+  );
+
+  const undo = useCallback(
+    () => setHistory((prev) => historyManager.undo(prev)),
+    [historyManager],
+  );
+
+  const redo = useCallback(
+    () => setHistory((prev) => historyManager.redo(prev)),
+    [historyManager],
   );
 
   return {
@@ -99,9 +148,12 @@ export const usePhotoEditor = (initialLayers: Layer[] = []) => {
     addStickerLayer,
     updateLayer,
     deleteLayer,
+    duplicateLayer,
+    moveLayerUp,
+    moveLayerDown,
     selectLayer: setActiveLayerId,
-    undo: useCallback(() => setHistory(historyManager.undo), [historyManager]),
-    redo: useCallback(() => setHistory(historyManager.redo), [historyManager]),
+    undo,
+    redo,
     canUndo: historyManager.canUndo(history),
     canRedo: historyManager.canRedo(history),
     filters,
