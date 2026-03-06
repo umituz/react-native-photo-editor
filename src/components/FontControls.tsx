@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { AtomicText, AtomicIcon } from "@umituz/react-native-design-system/atoms";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
@@ -32,7 +32,7 @@ export const FontControls: React.FC<FontControlsProps> = ({
 }) => {
   const tokens = useAppDesignTokens();
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     stepRow: {
       flexDirection: "row",
       gap: tokens.spacing.sm,
@@ -58,7 +58,7 @@ export const FontControls: React.FC<FontControlsProps> = ({
       alignItems: "center",
       gap: tokens.spacing.xs,
     },
-  });
+  }), [tokens]);
 
   return (
     <View style={externalStyles.controlsPanel}>

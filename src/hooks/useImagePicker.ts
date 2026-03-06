@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import * as ImagePicker from "expo-image-picker";
 
 export interface ImagePickerResult {
@@ -16,7 +16,7 @@ export interface UseImagePickerReturn {
 export const useImagePicker = (): UseImagePickerReturn => {
   const [loading, setLoading] = useState(false);
 
-  const pickFromGallery = async (
+  const pickFromGallery = useCallback(async (
     options?: ImagePicker.ImagePickerOptions,
   ): Promise<ImagePickerResult | null> => {
     setLoading(true);
@@ -39,9 +39,9 @@ export const useImagePicker = (): UseImagePickerReturn => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const takePhoto = async (
+  const takePhoto = useCallback(async (
     options?: ImagePicker.ImagePickerOptions,
   ): Promise<ImagePickerResult | null> => {
     setLoading(true);
@@ -63,7 +63,7 @@ export const useImagePicker = (): UseImagePickerReturn => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   return { pickFromGallery, takePhoto, loading };
 };

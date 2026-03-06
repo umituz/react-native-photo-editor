@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { AtomicText, AtomicIcon } from "@umituz/react-native-design-system/atoms";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
@@ -27,7 +27,7 @@ export const LayerManager: React.FC<LayerManagerProps> = ({
 }) => {
   const tokens = useAppDesignTokens();
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     container: { padding: tokens.spacing.md, gap: tokens.spacing.md },
     item: {
       flexDirection: "row",
@@ -53,7 +53,7 @@ export const LayerManager: React.FC<LayerManagerProps> = ({
       padding: tokens.spacing.xs,
       borderRadius: tokens.borders.radius.sm,
     },
-  });
+  }), [tokens]);
 
   const sortedLayers = [...layers].reverse(); // top layer first in list
 
@@ -73,7 +73,7 @@ export const LayerManager: React.FC<LayerManagerProps> = ({
             const isActive = activeLayerId === layer.id;
             const label =
               layer.type === "text"
-                ? (layer as TextLayer).text || t("editor.untitled") || "Untitled"
+                ? (layer as TextLayer).text || t("photo_editor.untitled") || "Untitled"
                 : "Sticker";
             const isTop = idx === 0;
             const isBottom = idx === sortedLayers.length - 1;

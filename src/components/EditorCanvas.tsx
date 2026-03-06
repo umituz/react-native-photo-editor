@@ -3,7 +3,7 @@ import { View, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import { DraggableText, LayerTransform } from "./DraggableText";
 import { DraggableSticker } from "./DraggableSticker";
-import { Layer, TextLayer, StickerLayer, ImageFilters } from "../types";
+import { Layer, ImageFilters } from "../types";
 
 interface EditorCanvasProps {
   imageUrl: string;
@@ -60,39 +60,37 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
 
       {layers.map((layer) => {
         if (layer.type === "text") {
-          const textLayer = layer as TextLayer;
           return (
             <DraggableText
               key={layer.id}
-              text={textLayer.text || "Tap to edit"}
-              color={textLayer.color}
-              fontSize={textLayer.fontSize}
-              fontFamily={textLayer.fontFamily}
-              textAlign={textLayer.textAlign}
-              rotation={textLayer.rotation}
-              scale={textLayer.scale}
-              opacity={textLayer.opacity}
-              backgroundColor={textLayer.backgroundColor}
-              isBold={textLayer.isBold}
-              isItalic={textLayer.isItalic}
-              initialX={textLayer.x}
-              initialY={textLayer.y}
+              text={layer.text || "Tap to edit"}
+              color={layer.color}
+              fontSize={layer.fontSize}
+              fontFamily={layer.fontFamily}
+              textAlign={layer.textAlign}
+              rotation={layer.rotation}
+              scale={layer.scale}
+              opacity={layer.opacity}
+              backgroundColor={layer.backgroundColor}
+              isBold={layer.isBold}
+              isItalic={layer.isItalic}
+              initialX={layer.x}
+              initialY={layer.y}
               onTransformEnd={(t) => onLayerTransform(layer.id, t)}
               onPress={() => onLayerTap(layer.id)}
               isSelected={activeLayerId === layer.id}
             />
           );
         } else if (layer.type === "sticker") {
-          const stickerLayer = layer as StickerLayer;
           return (
             <DraggableSticker
               key={layer.id}
-              uri={stickerLayer.uri}
-              initialX={stickerLayer.x}
-              initialY={stickerLayer.y}
-              rotation={stickerLayer.rotation}
-              scale={stickerLayer.scale}
-              opacity={stickerLayer.opacity}
+              uri={layer.uri}
+              initialX={layer.x}
+              initialY={layer.y}
+              rotation={layer.rotation}
+              scale={layer.scale}
+              opacity={layer.opacity}
               onTransformEnd={(t) => onLayerTransform(layer.id, t)}
               onPress={() => onLayerTap(layer.id)}
               isSelected={activeLayerId === layer.id}

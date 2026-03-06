@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import { AtomicText, AtomicButton } from "@umituz/react-native-design-system/atoms";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
@@ -42,7 +42,7 @@ export const TextEditorSheet: React.FC<TextEditorSheetProps> = ({
 }) => {
   const tokens = useAppDesignTokens();
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     container: { padding: tokens.spacing.md, gap: tokens.spacing.md },
     input: {
       backgroundColor: tokens.colors.surfaceVariant,
@@ -72,16 +72,16 @@ export const TextEditorSheet: React.FC<TextEditorSheetProps> = ({
       borderColor: tokens.colors.primary,
       backgroundColor: tokens.colors.primary + "20",
     },
-  });
+  }), [tokens]);
 
   return (
     <View style={styles.container}>
-      <AtomicText type="headlineSmall">{t("editor.add_text") || "Edit Text"}</AtomicText>
+      <AtomicText type="headlineSmall">{t("photo_editor.add_text") || "Edit Text"}</AtomicText>
 
       <TextInput
         value={value}
         onChangeText={onChange}
-        placeholder={t("editor.tap_to_edit") || "Enter text…"}
+        placeholder={t("photo_editor.tap_to_edit") || "Enter text…"}
         placeholderTextColor={tokens.colors.textSecondary}
         style={styles.input}
         multiline

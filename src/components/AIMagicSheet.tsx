@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { View, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { AtomicText, AtomicIcon, AtomicButton } from "@umituz/react-native-design-system/atoms";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
@@ -21,7 +21,7 @@ export const AIMagicSheet: React.FC<AIMagicSheetProps> = ({
   const [selected, setSelected] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     container: { padding: tokens.spacing.md, gap: tokens.spacing.md },
     header: { flexDirection: "row", alignItems: "center", gap: tokens.spacing.sm },
     grid: { gap: tokens.spacing.sm },
@@ -39,7 +39,7 @@ export const AIMagicSheet: React.FC<AIMagicSheetProps> = ({
       backgroundColor: tokens.colors.primary + "10",
     },
     info: { flex: 1, marginLeft: tokens.spacing.sm },
-  });
+  }), [tokens]);
 
   const handleGenerate = async () => {
     if (!selected || !onGenerateCaption) return;

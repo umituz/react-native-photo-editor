@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { AtomicText } from "@umituz/react-native-design-system/atoms";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
@@ -15,7 +15,7 @@ export const StickerPicker: React.FC<StickerPickerProps> = ({
 }) => {
   const tokens = useAppDesignTokens();
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     container: { padding: tokens.spacing.md, gap: tokens.spacing.md },
     grid: { flexDirection: "row", flexWrap: "wrap", gap: tokens.spacing.sm },
     sticker: {
@@ -26,7 +26,7 @@ export const StickerPicker: React.FC<StickerPickerProps> = ({
       alignItems: "center",
       justifyContent: "center",
     },
-  });
+  }), [tokens]);
 
   return (
     <View style={styles.container}>

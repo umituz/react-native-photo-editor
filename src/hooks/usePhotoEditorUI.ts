@@ -40,7 +40,6 @@ export const usePhotoEditorUI = (initialCaption?: string) => {
       initialCaptionApplied.current = true;
       editor.addTextLayer(tokens.colors.textPrimary, { text: initialCaption });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleTextLayerTap = useCallback(
@@ -152,12 +151,10 @@ export const usePhotoEditorUI = (initialCaption?: string) => {
         fontFamily: selectedFont,
       });
       textEditorSheetRef.current?.present();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [editor, fontSize, selectedFont, tokens.colors.textPrimary]),
     handleSelectSticker: useCallback((uri: string) => {
       editor.addStickerLayer(uri);
       stickerSheetRef.current?.dismiss();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [editor]),
   };
 };

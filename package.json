@@ -1,6 +1,6 @@
 {
   "name": "@umituz/react-native-photo-editor",
-  "version": "2.0.1",
+  "version": "2.0.3",
   "description": "A powerful, generic photo editor for React Native",
   "main": "src/index.ts",
   "types": "src/index.ts",

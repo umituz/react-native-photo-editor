@@ -30,7 +30,6 @@ const ToolButton = ({
   onPress,
   isActive,
   disabled,
-  tokens,
   parentStyles,
 }: {
   icon: string;
@@ -38,7 +37,6 @@ const ToolButton = ({
   onPress: () => void;
   isActive?: boolean;
   disabled?: boolean;
-  tokens: ReturnType<typeof useAppDesignTokens>;
   parentStyles: EditorToolbarProps["styles"];
 }) => (
   <TouchableOpacity
@@ -84,28 +82,25 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
       {onUndo && (
         <ToolButton
           icon="arrow-back"
-          label={t("editor.undo") || "Undo"}
+          label={t("photo_editor.undo") || "Undo"}
           onPress={onUndo}
           disabled={!canUndo}
-          tokens={tokens}
           parentStyles={parentStyles}
         />
       )}
 
       <ToolButton
         icon="edit"
-        label={t("editor.text") || "Text"}
+        label={t("photo_editor.text") || "Text"}
         onPress={onAddText}
-        tokens={tokens}
         parentStyles={parentStyles}
       />
 
       {onAddSticker && (
         <ToolButton
           icon="sparkles"
-          label={t("editor.sticker") || "Sticker"}
+          label={t("photo_editor.sticker") || "Sticker"}
           onPress={onAddSticker}
-          tokens={tokens}
           parentStyles={parentStyles}
         />
       )}
@@ -124,9 +119,8 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
       {onOpenAdjustments && (
         <ToolButton
           icon="flash"
-          label={t("editor.adjust") || "Adjust"}
+          label={t("photo_editor.adjust") || "Adjust"}
           onPress={onOpenAdjustments}
-          tokens={tokens}
           parentStyles={parentStyles}
         />
       )}
@@ -134,28 +128,25 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
       {onOpenFilters && (
         <ToolButton
           icon="brush"
-          label={t("editor.filters") || "Filters"}
+          label={t("photo_editor.filters") || "Filters"}
           onPress={onOpenFilters}
-          tokens={tokens}
           parentStyles={parentStyles}
         />
       )}
 
       <ToolButton
         icon="copy"
-        label={t("editor.layers") || "Layers"}
+        label={t("photo_editor.layers") || "Layers"}
         onPress={onOpenLayers}
-        tokens={tokens}
         parentStyles={parentStyles}
       />
 
       {onRedo && (
         <ToolButton
           icon="chevron-forward"
-          label={t("editor.redo") || "Redo"}
+          label={t("photo_editor.redo") || "Redo"}
           onPress={onRedo}
           disabled={!canRedo}
-          tokens={tokens}
           parentStyles={parentStyles}
         />
       )}

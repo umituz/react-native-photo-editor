@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { AtomicText, AtomicIcon } from "@umituz/react-native-design-system/atoms";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
@@ -17,7 +17,7 @@ export const FilterPicker: React.FC<FilterPickerProps> = ({
 }) => {
   const tokens = useAppDesignTokens();
 
-  const styles = StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     container: { padding: tokens.spacing.md, gap: tokens.spacing.md },
     grid: { flexDirection: "row", flexWrap: "wrap", gap: tokens.spacing.sm },
     filter: {
@@ -34,7 +34,7 @@ export const FilterPicker: React.FC<FilterPickerProps> = ({
       borderColor: tokens.colors.primary,
       backgroundColor: tokens.colors.primary + "10",
     },
-  });
+  }), [tokens]);
 
   return (
     <View style={styles.container}>
