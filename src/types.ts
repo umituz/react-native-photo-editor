@@ -59,3 +59,12 @@ export interface EditorState {
   canvasSize: { width: number; height: number };
   filters: ImageFilters;
 }
+
+// Type guards for discriminating union types
+export function isTextLayer(layer: Layer): layer is TextLayer {
+  return layer.type === "text";
+}
+
+export function isStickerLayer(layer: Layer): layer is StickerLayer {
+  return layer.type === "sticker";
+}

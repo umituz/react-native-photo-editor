@@ -63,7 +63,8 @@ export const deleteLocalFile = async (uri: string): Promise<void> => {
     if (file.exists) {
       file.delete();
     }
-  } catch {
-    // silent — best-effort cleanup
+  } catch (error) {
+    // Best-effort cleanup — log but don't throw
+    console.warn("[mediaUtils] Failed to delete local file:", uri, error);
   }
 };

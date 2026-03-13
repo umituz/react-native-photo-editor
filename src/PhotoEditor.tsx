@@ -1,11 +1,11 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useCallback } from "react";
 import { View, ScrollView, TouchableOpacity } from "react-native";
 import { AtomicText, AtomicIcon } from "@umituz/react-native-design-system/atoms";
 import { BottomSheetModal } from "@umituz/react-native-design-system/molecules";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
 import { useSafeAreaInsets } from "@umituz/react-native-design-system/safe-area";
 
-import { EditorCanvas } from "./components/EditorCanvas";
+import EditorCanvas from "./components/EditorCanvas";
 import { EditorToolbar } from "./components/EditorToolbar";
 import { FontControls } from "./components/FontControls";
 import { LayerManager } from "./components/LayerManager";
@@ -19,19 +19,6 @@ import { usePhotoEditorUI } from "./hooks/usePhotoEditorUI";
 import { Layer, ImageFilters } from "./types";
 import { DEFAULT_FONTS } from "./constants";
 
-export interface EditorActions {
-  addTextLayer: (defaultColor?: string) => string;
-  updateLayer: (id: string, updates: Partial<Layer>) => void;
-  duplicateLayer: (id: string) => string | null;
-  deleteLayer: (id: string) => void;
-  moveLayerUp: (id: string) => void;
-  moveLayerDown: (id: string) => void;
-  getLayers: () => Layer[];
-  getActiveLayerId: () => string | null;
-  undo: () => void;
-  redo: () => void;
-}
-
 export interface PhotoEditorProps {
   imageUri: string;
   /**
@@ -42,8 +29,8 @@ export interface PhotoEditorProps {
   onSave?: (uri: string, layers: Layer[], filters: ImageFilters) => void;
   onClose: () => void;
   title?: string;
-  /** Render extra tools below the canvas. Receives editor action helpers. */
-  customTools?: React.ReactNode | ((actions: EditorActions) => React.ReactNode);
+  /** Render extra tools below the canvas. Receives editor state helpers. */
+  customTools?: React.ReactNode | ((ui: ReturnType<typeof usePhotoEditorUI>) => React.ReactNode);
   initialCaption?: string;
   t: (key: string) => string;
   fonts?: readonly string[];
@@ -51,7 +38,7 @@ export interface PhotoEditorProps {
   onAICaption?: (style: string) => Promise<string> | void;
 }
 
-export const PhotoEditor: React.FC<PhotoEditorProps> = ({
+export function PhotoEditor({
   imageUri,
   onSave,
   onClose,
@@ -61,7 +48,7 @@ export const PhotoEditor: React.FC<PhotoEditorProps> = ({
   t,
   fonts = DEFAULT_FONTS,
   onAICaption,
-}) => {
+}: PhotoEditorProps) {
   const tokens = useAppDesignTokens();
   const insets = useSafeAreaInsets();
   const styles = useMemo(
@@ -70,24 +57,10 @@ export const PhotoEditor: React.FC<PhotoEditorProps> = ({
   );
   const ui = usePhotoEditorUI(initialCaption);
 
-  const actions: EditorActions = useMemo(
-    () => ({
-      addTextLayer: (color?: string) =>
-        ui.addTextLayer(color ?? tokens.colors.textPrimary),
-      updateLayer: ui.updateLayer,
-      duplicateLayer: ui.duplicateLayer,
-      deleteLayer: ui.deleteLayer,
-      moveLayerUp: ui.moveLayerUp,
-      moveLayerDown: ui.moveLayerDown,
-      getLayers: () => ui.layers,
-      getActiveLayerId: () => ui.activeLayerId,
-      undo: ui.undo,
-      redo: ui.redo,
-    }),
-    [ui, tokens.colors.textPrimary],
+  const handleSave = useCallback(
+    () => onSave?.(imageUri, ui.layers, ui.filters),
+    [onSave, imageUri, ui.layers, ui.filters],
   );
-
-  const handleSave = () => onSave?.(imageUri, ui.layers, ui.filters);
 
   return (
     <View style={styles.container}>
@@ -125,7 +98,7 @@ export const PhotoEditor: React.FC<PhotoEditorProps> = ({
           styles={styles}
         />
 
-        {typeof customTools === "function" ? customTools(actions) : customTools}
+        {typeof customTools === "function" ? customTools(ui) : customTools}
 
         <FontControls
           fontSize={ui.fontSize}
@@ -208,4 +181,4 @@ export const PhotoEditor: React.FC<PhotoEditorProps> = ({
       )}
     </View>
   );
-};
+}

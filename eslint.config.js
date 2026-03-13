@@ -13,6 +13,9 @@ module.exports = [
         sourceType: "module",
         project: "./tsconfig.json",
       },
+      globals: {
+        console: "readonly",
+      },
     },
     plugins: {
       "@typescript-eslint": tseslint,
@@ -23,6 +26,7 @@ module.exports = [
       "@typescript-eslint/explicit-function-return-type": "off",
       "@typescript-eslint/no-explicit-any": "warn",
       "no-console": "off",
+      "no-undef": "off",
     },
   },
   {

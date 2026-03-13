@@ -34,7 +34,8 @@ export const useImagePicker = (): UseImagePickerReturn => {
       if (result.canceled || result.assets.length === 0) return null;
       const asset = result.assets[0];
       return { uri: asset.uri, width: asset.width, height: asset.height };
-    } catch {
+    } catch (error) {
+      console.error("[useImagePicker] Error picking from gallery:", error);
       return null;
     } finally {
       setLoading(false);
@@ -58,7 +59,8 @@ export const useImagePicker = (): UseImagePickerReturn => {
       if (result.canceled || result.assets.length === 0) return null;
       const asset = result.assets[0];
       return { uri: asset.uri, width: asset.width, height: asset.height };
-    } catch {
+    } catch (error) {
+      console.error("[useImagePicker] Error taking photo:", error);
       return null;
     } finally {
       setLoading(false);

@@ -1,20 +1,9 @@
+// Public API exports
+export { PhotoEditor } from "./PhotoEditor";
+export type { PhotoEditorProps } from "./PhotoEditor";
+
+// Type exports for consumer usage
 export * from "./types";
+
+// Constant exports for consumer customization
 export * from "./constants";
-export * from "./hooks/usePhotoEditor";
-export * from "./hooks/usePhotoEditorUI";
-export * from "./hooks/useImagePicker";
-export * from "./utils/mediaUtils";
-export * from "./core/HistoryManager";
-export * from "./components/EditorCanvas";
-export * from "./components/LayerManager";
-export * from "./components/FontControls";
-export * from "./components/FilterPicker";
-export * from "./components/DraggableText";
-export * from "./components/DraggableSticker";
-export * from "./components/AIMagicSheet";
-export * from "./components/TextEditorSheet";
-export * from "./components/StickerPicker";
-export * from "./components/EditorToolbar";
-export * from "./components/ColorPicker";
-export * from "./components/AdjustmentsSheet";
-export * from "./PhotoEditor";

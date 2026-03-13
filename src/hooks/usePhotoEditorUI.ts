@@ -34,16 +34,18 @@ export const usePhotoEditorUI = (initialCaption?: string) => {
   const editor = usePhotoEditor([]);
 
   // Apply initial caption once on mount — single history entry
-  const initialCaptionApplied = useRef(false);
+  const prevInitialCaptionRef = useRef<string | undefined>(undefined);
+
   useEffect(() => {
-    if (initialCaption && !initialCaptionApplied.current) {
-      initialCaptionApplied.current = true;
+    // Only apply if initialCaption changed and is different from previous value
+    if (initialCaption && initialCaption !== prevInitialCaptionRef.current) {
+      prevInitialCaptionRef.current = initialCaption;
       editor.addTextLayer(tokens.colors.textPrimary, { text: initialCaption });
     }
-  }, []);
+  }, [initialCaption, editor]);
 
   const handleTextLayerTap = useCallback(
-    (layerId: string) => {
+    (layerId: string): void => {
       editor.selectLayer(layerId);
       const layer = editor.layers.find((l) => l.id === layerId);
       if (layer?.type === "text") {
@@ -60,7 +62,7 @@ export const usePhotoEditorUI = (initialCaption?: string) => {
     [editor, tokens.colors.textPrimary],
   );
 
-  const handleSaveText = useCallback(() => {
+  const handleSaveText = useCallback((): void => {
     if (editor.activeLayerId) {
       editor.updateLayer(editor.activeLayerId, {
         text: editingText,
@@ -85,7 +87,7 @@ export const usePhotoEditorUI = (initialCaption?: string) => {
   ]);
 
   const handleSelectFilter = useCallback(
-    (option: FilterOption) => {
+    (option: FilterOption): void => {
       setSelectedFilter(option.id);
       const newFilters: ImageFilters = { ...DEFAULT_IMAGE_FILTERS, ...option.filters };
       editor.updateFilters(newFilters);
@@ -95,7 +97,7 @@ export const usePhotoEditorUI = (initialCaption?: string) => {
   );
 
   const handleLayerTransform = useCallback(
-    (layerId: string, transform: LayerTransform) => {
+    (layerId: string, transform: LayerTransform): void => {
       editor.updateLayer(layerId, {
         x: transform.x,
         y: transform.y,
@@ -138,7 +140,7 @@ export const usePhotoEditorUI = (initialCaption?: string) => {
     handleSaveText,
     handleSelectFilter,
     handleLayerTransform,
-    handleAddText: useCallback(() => {
+    handleAddText: useCallback((): void => {
       const color = tokens.colors.textPrimary;
       setEditingText("");
       setEditingColor(color);
@@ -152,7 +154,7 @@ export const usePhotoEditorUI = (initialCaption?: string) => {
       });
       textEditorSheetRef.current?.present();
     }, [editor, fontSize, selectedFont, tokens.colors.textPrimary]),
-    handleSelectSticker: useCallback((uri: string) => {
+    handleSelectSticker: useCallback((uri: string): void => {
       editor.addStickerLayer(uri);
       stickerSheetRef.current?.dismiss();
     }, [editor]),

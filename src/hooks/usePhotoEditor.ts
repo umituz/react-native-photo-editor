@@ -15,7 +15,7 @@ export const usePhotoEditor = (initialLayers: Layer[] = []) => {
   const layers = history.present;
 
   const pushState = useCallback(
-    (newLayers: Layer[]) => {
+    (newLayers: Layer[]): void => {
       setHistory((prev) => historyManager.push(prev, newLayers));
     },
     [historyManager],
@@ -73,17 +73,19 @@ export const usePhotoEditor = (initialLayers: Layer[] = []) => {
   );
 
   const updateLayer = useCallback(
-    (id: string, updates: Partial<Layer>) => {
-      const newLayers = layers.map(
-        (l) => (l.id === id ? ({ ...l, ...updates } as Layer) : l),
-      );
+    (id: string, updates: Partial<Layer>): void => {
+      const newLayers = layers.map((l) => {
+        if (l.id !== id) return l;
+        // Type-safe merge: cast to Layer since we're merging valid Partial<Layer> with existing Layer
+        return { ...l, ...updates } as Layer;
+      });
       pushState(newLayers);
     },
     [layers, pushState],
   );
 
   const deleteLayer = useCallback(
-    (id: string) => {
+    (id: string): void => {
       const newLayers = layers.filter((l) => l.id !== id);
       pushState(newLayers);
       if (activeLayerId === id) {
@@ -94,11 +96,13 @@ export const usePhotoEditor = (initialLayers: Layer[] = []) => {
   );
 
   const duplicateLayer = useCallback(
-    (id: string) => {
+    (id: string): string | null => {
       const layer = layers.find((l) => l.id === id);
       if (!layer) return null;
       const newId = `${layer.type}-${Date.now()}`;
-      const newLayer = { ...layer, id: newId, x: layer.x + 20, y: layer.y + 20, zIndex: layers.length };
+      // Calculate the next zIndex to avoid conflicts
+      const maxZIndex = layers.length > 0 ? Math.max(...layers.map((l) => l.zIndex)) : -1;
+      const newLayer = { ...layer, id: newId, x: layer.x + 20, y: layer.y + 20, zIndex: maxZIndex + 1 };
       pushState([...layers, newLayer]);
       setActiveLayerId(newId);
       return newId;
@@ -107,7 +111,7 @@ export const usePhotoEditor = (initialLayers: Layer[] = []) => {
   );
 
   const moveLayerUp = useCallback(
-    (id: string) => {
+    (id: string): void => {
       const sorted = [...layers].sort((a, b) => a.zIndex - b.zIndex);
       const idx = sorted.findIndex((l) => l.id === id);
       if (idx >= sorted.length - 1) return;
@@ -131,19 +135,25 @@ export const usePhotoEditor = (initialLayers: Layer[] = []) => {
   );
 
   const undo = useCallback(
-    () => setHistory((prev) => historyManager.undo(prev)),
+    (): void => setHistory((prev) => historyManager.undo(prev)),
     [historyManager],
   );
 
   const redo = useCallback(
-    () => setHistory((prev) => historyManager.redo(prev)),
+    (): void => setHistory((prev) => historyManager.redo(prev)),
     [historyManager],
   );
 
+  // Memoize return object to prevent infinite re-renders
+  const sortedLayers = useMemo(() => [...layers].sort((a, b) => a.zIndex - b.zIndex), [layers]);
+  const activeLayer = useMemo(() => layers.find((l) => l.id === activeLayerId), [layers, activeLayerId]);
+  const canUndo = useMemo(() => historyManager.canUndo(history), [history]);
+  const canRedo = useMemo(() => historyManager.canRedo(history), [history]);
+
   return {
-    layers: [...layers].sort((a, b) => a.zIndex - b.zIndex),
+    layers: sortedLayers,
     activeLayerId,
-    activeLayer: layers.find((l) => l.id === activeLayerId),
+    activeLayer,
     addTextLayer,
     addStickerLayer,
     updateLayer,
@@ -154,8 +164,8 @@ export const usePhotoEditor = (initialLayers: Layer[] = []) => {
     selectLayer: setActiveLayerId,
     undo,
     redo,
-    canUndo: historyManager.canUndo(history),
-    canRedo: historyManager.canRedo(history),
+    canUndo,
+    canRedo,
     filters,
     updateFilters: setFilters,
   };
