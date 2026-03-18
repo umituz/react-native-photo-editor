@@ -1,9 +1,29 @@
-// Public API exports
+/**
+ * @umituz/react-native-photo-editor
+ *
+ * A powerful, generic photo editor for React Native
+ * Built with DDD principles for maintainability
+ */
+
+// Main component
 export { PhotoEditor } from "./PhotoEditor";
 export type { PhotoEditorProps } from "./PhotoEditor";
 
-// Type exports for consumer usage
-export * from "./types";
+// Domain entities
+export type { Layer, TextLayer, StickerLayer } from "./domain/entities/Layer";
+export type { Transform } from "./domain/entities/Transform";
+export type { FilterValues, FiltersVO } from "./domain/entities/Filters";
+export { isTextLayer, isStickerLayer } from "./domain/entities/Layer";
 
-// Constant exports for consumer customization
-export * from "./constants";
+// Application hooks
+export { useEditor } from "./application/hooks/useEditor";
+export { useEditorUI } from "./application/hooks/useEditorUI";
+
+// Types & constants
+export type { LayerTransform } from "./infrastructure/gesture/types";
+export { DEFAULT_IMAGE_FILTERS } from "./domain/entities/Filters";
+export { DEFAULT_FONTS, DEFAULT_TEXT_COLORS, DEFAULT_STICKERS, DEFAULT_AI_STYLES } from "./constants";
+export type { FilterOption } from "./presentation/components/sheets/FilterSheet";
+
+// Legacy types (for backward compatibility)
+export * from "./types";

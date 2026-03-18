@@ -1,40 +1,36 @@
-import React, { useMemo, useCallback } from "react";
+/**
+ * Photo Editor Component
+ * Main entry point for the photo editor
+ */
+
+import React, { useCallback, useMemo } from "react";
 import { View, ScrollView, TouchableOpacity } from "react-native";
-import { AtomicText, AtomicIcon } from "@umituz/react-native-design-system/atoms";
 import { BottomSheetModal } from "@umituz/react-native-design-system/molecules";
+import { AtomicText, AtomicIcon } from "@umituz/react-native-design-system/atoms";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
 import { useSafeAreaInsets } from "@umituz/react-native-design-system/safe-area";
 
-import EditorCanvas from "./components/EditorCanvas";
-import { EditorToolbar } from "./components/EditorToolbar";
-import { FontControls } from "./components/FontControls";
-import { LayerManager } from "./components/LayerManager";
-import { TextEditorSheet } from "./components/TextEditorSheet";
-import { StickerPicker } from "./components/StickerPicker";
-import { FilterPicker } from "./components/FilterPicker";
-import { AdjustmentsSheet } from "./components/AdjustmentsSheet";
-import { AIMagicSheet } from "./components/AIMagicSheet";
-import { createEditorStyles } from "./styles";
-import { usePhotoEditorUI } from "./hooks/usePhotoEditorUI";
-import { Layer, ImageFilters } from "./types";
+import { EditorCanvas } from "./presentation/components/EditorCanvas";
+import { EditorToolbar } from "./presentation/components/EditorToolbar";
+import { FontControls } from "./presentation/components/FontControls";
+import { TextEditorSheet } from "./presentation/components/sheets/TextEditorSheet";
+import { StickerPicker } from "./presentation/components/sheets/StickerPicker";
+import { FilterSheet } from "./presentation/components/sheets/FilterSheet";
+import { AdjustmentsSheet } from "./presentation/components/sheets/AdjustmentsSheet";
+import { LayerManager } from "./presentation/components/sheets/LayerManager";
+import { AIMagicSheet } from "./presentation/components/sheets/AIMagicSheet";
+import { useEditorUI } from "./application/hooks/useEditorUI";
 import { DEFAULT_FONTS } from "./constants";
 
 export interface PhotoEditorProps {
   imageUri: string;
-  /**
-   * Called when the user taps Save.
-   * Receives the original imageUri, current layers, and active filters
-   * so the host app can composite/export however it needs.
-   */
-  onSave?: (uri: string, layers: Layer[], filters: ImageFilters) => void;
+  onSave?: (uri: string, layers: any[], filters: Record<string, number>) => void;
   onClose: () => void;
   title?: string;
-  /** Render extra tools below the canvas. Receives editor state helpers. */
-  customTools?: React.ReactNode | ((ui: ReturnType<typeof usePhotoEditorUI>) => React.ReactNode);
+  customTools?: React.ReactNode | ((ui: ReturnType<typeof useEditorUI>) => React.ReactNode);
   initialCaption?: string;
   t: (key: string) => string;
   fonts?: readonly string[];
-  /** Pass a handler to enable the AI caption feature */
   onAICaption?: (style: string) => Promise<string> | void;
 }
 
@@ -51,14 +47,35 @@ export function PhotoEditor({
 }: PhotoEditorProps) {
   const tokens = useAppDesignTokens();
   const insets = useSafeAreaInsets();
-  const styles = useMemo(
-    () => createEditorStyles(tokens, insets),
-    [tokens, insets],
-  );
-  const ui = usePhotoEditorUI(initialCaption);
+  const ui = useEditorUI(initialCaption);
+
+  const styles = useMemo(() => ({
+    container: {
+      flex: 1,
+      backgroundColor: tokens.colors.surface,
+      paddingTop: insets.top,
+    },
+    header: {
+      flexDirection: "row" as const,
+      alignItems: "center" as const,
+      justifyContent: "space-between" as const,
+      paddingHorizontal: tokens.spacing.md,
+      paddingVertical: tokens.spacing.sm,
+      borderBottomWidth: 1,
+      borderBottomColor: tokens.colors.border,
+    },
+    headerTitle: {
+      flex: 1,
+      textAlign: "center",
+    },
+    scrollContent: {
+      padding: tokens.spacing.md,
+      gap: tokens.spacing.md,
+    },
+  }), [tokens, insets]);
 
   const handleSave = useCallback(
-    () => onSave?.(imageUri, ui.layers, ui.filters),
+    () => onSave?.(imageUri, ui.layers.map(l => l.toJSON()), ui.filters),
     [onSave, imageUri, ui.layers, ui.filters],
   );
 
@@ -66,21 +83,13 @@ export function PhotoEditor({
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={onClose}
-          accessibilityLabel="Close editor"
-          accessibilityRole="button"
-        >
+        <TouchableOpacity onPress={onClose} accessibilityLabel="Close editor" accessibilityRole="button">
           <AtomicIcon name="close" size="md" color="textPrimary" />
         </TouchableOpacity>
         <AtomicText type="headlineSmall" style={styles.headerTitle}>
           {title}
         </AtomicText>
-        <TouchableOpacity
-          onPress={handleSave}
-          accessibilityLabel="Save"
-          accessibilityRole="button"
-        >
+        <TouchableOpacity onPress={handleSave} accessibilityLabel="Save" accessibilityRole="button">
           <AtomicText fontWeight="bold" color="primary">
             {t("common.save") || "Save"}
           </AtomicText>
@@ -95,7 +104,6 @@ export function PhotoEditor({
           filters={ui.filters}
           onLayerTap={ui.handleTextLayerTap}
           onLayerTransform={ui.handleLayerTransform}
-          styles={styles}
         />
 
         {typeof customTools === "function" ? customTools(ui) : customTools}
@@ -106,7 +114,6 @@ export function PhotoEditor({
           fonts={fonts}
           onFontSizeChange={ui.setFontSize}
           onFontSelect={ui.setSelectedFont}
-          styles={styles}
         />
       </ScrollView>
 
@@ -121,7 +128,6 @@ export function PhotoEditor({
         onRedo={ui.redo}
         canUndo={ui.canUndo}
         canRedo={ui.canRedo}
-        styles={styles}
         t={t}
       />
 
@@ -148,9 +154,13 @@ export function PhotoEditor({
       </BottomSheetModal>
 
       <BottomSheetModal ref={ui.filterSheetRef} snapPoints={["40%"]}>
-        <FilterPicker
+        <FilterSheet
           selectedFilter={ui.selectedFilter}
-          onSelectFilter={ui.handleSelectFilter}
+          onSelectFilter={(option) => {
+            ui.setSelectedFilter(option.id);
+            ui.updateFilters(option.filters);
+            ui.filterSheetRef.current?.dismiss();
+          }}
         />
       </BottomSheetModal>
 
@@ -182,3 +192,5 @@ export function PhotoEditor({
     </View>
   );
 }
+
+export default PhotoEditor;
