@@ -12,7 +12,8 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "setup:skill": "node -e \"const fs = require('fs'); const path = require('path'); const skillDir = path.join(process.env.HOME, '.claude', 'skills', 'react-native-photo-editor'); fs.mkdirSync(skillDir, {recursive: true}); fs.copyFileSync(path.join(__dirname, 'skills/SKILL.md'), path.join(skillDir, 'SKILL.md')); console.log('✅ @umituz/react-native-photo-editor setup skill installed to Claude Code!');\""
   },
   "keywords": [
     "react-native",
