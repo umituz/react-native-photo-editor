@@ -10,10 +10,12 @@ export { PhotoEditor } from "./PhotoEditor";
 export type { PhotoEditorProps } from "./PhotoEditor";
 
 // Domain entities
-export type { Layer, TextLayer, StickerLayer } from "../entities/Layer.entity"";
+export type { Layer, TextLayer, StickerLayer } from "./domain/entities/Layer.entity";
+export type { TextContent as TextLayerData, StickerContent as StickerLayerData } from "./domain/types";
+export type { TextAlign } from "./domain/types";
 export type { Transform } from "./domain/entities/Transform";
 export type { FilterValues, FiltersVO } from "./domain/entities/Filters";
-export { isTextLayer, isStickerLayer } from "../entities/Layer.entity"";
+export { isTextLayer, isStickerLayer } from "./domain/entities/Layer.entity";
 
 // Application hooks
 export { useEditor } from "./application/hooks/useEditor";

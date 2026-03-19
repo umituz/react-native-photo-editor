@@ -59,7 +59,7 @@ export function useEditor() {
   ]);
 }
 
-export type { Layer } from "../entities/Layer.entity"";
+export type { Layer } from "../../domain/entities/Layer.entity";
 export type { Transform } from "../../domain/entities/Transform";
 export type { FilterValues } from "../../domain/entities/Filters";
-export type { TextLayerData } from "../entities/Layer.entity"";
+export type { TextContent as TextLayerData } from "../../domain/types";

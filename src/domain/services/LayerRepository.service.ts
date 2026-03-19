@@ -3,7 +3,7 @@
  * CRUD operations for layers with history support
  */
 
-import type { Layer } from "../entities/Layer.entity".entity";
+import type { Layer } from "../entities/Layer.entity";
 import { LayerFactory } from "./LayerFactory.service";
 
 export class LayerRepository {
@@ -47,6 +47,11 @@ export class LayerRepository {
   duplicateLayer(layers: Layer[], layerId: string): Layer[] {
     const layer = layers.find((l) => l.id === layerId);
     if (!layer) return layers;
+
+    // Type narrowing - only TextLayer and StickerLayer can be duplicated
+    if (!layer.isText() && !layer.isSticker()) {
+      return layers;
+    }
 
     const duplicate = this.factory.duplicateLayer(layer, layers);
     return [...layers, duplicate];

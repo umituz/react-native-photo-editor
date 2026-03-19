@@ -7,7 +7,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import type { BottomSheetModalRef } from "@umituz/react-native-design-system/molecules";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
 import { useEditor } from "./useEditor";
-import type { TextAlign } from "../entities/Layer.entity"";
+import type { TextAlign } from "../../domain/types";
 import type { Transform } from "../../domain/entities/Transform";
 
 export function useEditorUI(initialCaption?: string) {

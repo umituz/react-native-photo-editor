@@ -6,7 +6,7 @@
 import { TextLayer } from "../entities/TextLayer.entity";
 import { StickerLayer } from "../entities/StickerLayer.entity";
 import { LayerDefaults } from "../value-objects/LayerDefaults.vo";
-import type { Position, Appearance, TextContent, StickerContent } from "../types";
+import type { Position, Appearance, TextContent } from "../types";
 
 export class LayerFactory {
   createTextLayer(overrides?: Partial<Position & Appearance & TextContent>): TextLayer {

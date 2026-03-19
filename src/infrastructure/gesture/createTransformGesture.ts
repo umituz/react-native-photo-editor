@@ -5,7 +5,7 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { Gesture } from "react-native-gesture-handler";
-import type { Layer } from "../entities/Layer.entity".entity";
+import type { Layer } from "../../domain/entities/Layer.entity";
 
 export interface TransformGestureState {
   position: { x: number; y: number };

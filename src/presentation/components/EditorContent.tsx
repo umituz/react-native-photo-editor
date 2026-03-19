@@ -8,7 +8,7 @@ import { ScrollView } from "react-native";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
 import { EditorCanvas } from "./EditorCanvas";
 import { FontControls } from "./FontControls";
-import type { Layer } from "../entities/Layer.entity".entity";
+import type { Layer } from "../../domain/entities/Layer.entity";
 import type { FilterSettings } from "../../domain/value-objects/FilterSettings.vo";
 import type { EditorUIState } from "../../application/hooks/useEditorUI";
 

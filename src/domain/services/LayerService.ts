@@ -3,7 +3,10 @@
  * Business logic for layer operations
  */
 
-import { Layer, TextLayer, StickerLayer, type TextLayerData, type StickerLayerData } from "../entities/Layer.entity"";
+import { Layer } from "../entities/Layer.entity";
+import { TextLayer } from "../entities/TextLayer.entity";
+import { StickerLayer } from "../entities/StickerLayer.entity";
+import type { TextContent } from "../types";
 import type { Transform } from "../entities/Transform";
 
 export class LayerService {
@@ -11,18 +14,10 @@ export class LayerService {
     return `${type}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  createTextLayer(overrides: Partial<Omit<TextLayerData, "id" | "type">> = {}): TextLayer {
+  createTextLayer(overrides: Partial<TextContent> = {}): TextLayer {
     const id = this.generateId("text");
-    const defaults: TextLayerData = {
-      id,
-      type: "text",
+    const contentDefaults: TextContent = {
       text: "",
-      x: 50,
-      y: 50,
-      rotation: 0,
-      scale: 1,
-      opacity: 1,
-      zIndex: 0,
       fontSize: 32,
       fontFamily: "System",
       color: "#FFFFFF",
@@ -32,24 +27,27 @@ export class LayerService {
       isItalic: false,
     };
 
-    return new TextLayer({ ...defaults, ...overrides });
-  }
-
-  createStickerLayer(uri: string, overrides: Partial<Omit<StickerLayerData, "id" | "type" | "uri">> = {}): StickerLayer {
-    const id = this.generateId("sticker");
-    const defaults: StickerLayerData = {
+    return new TextLayer({
       id,
-      type: "sticker",
-      uri,
-      x: 100,
-      y: 100,
+      position: { x: 50, y: 50 },
       rotation: 0,
       scale: 1,
-      opacity: 1,
-      zIndex: 0,
-    };
+      appearance: { opacity: 1, zIndex: 0 },
+      content: { ...contentDefaults, ...overrides },
+    });
+  }
 
-    return new StickerLayer({ ...defaults, ...overrides });
+  createStickerLayer(uri: string, _overrides: Record<string, never> = {}): StickerLayer {
+    const id = this.generateId("sticker");
+
+    return new StickerLayer({
+      id,
+      position: { x: 100, y: 100 },
+      rotation: 0,
+      scale: 1,
+      appearance: { opacity: 1, zIndex: 0 },
+      content: { uri },
+    });
   }
 
   updateLayer(layers: Layer[], layerId: string, updates: Partial<Transform>): Layer[] {

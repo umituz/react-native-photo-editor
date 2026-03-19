@@ -21,7 +21,7 @@ export interface PhotoEditorProps {
   onSave?: (uri: string, layers: Layer[], filters: FilterSettings) => void;
   onClose: () => void;
   title?: string;
-  customTools?: React.ReactNode | ((ui: any) => React.ReactNode);
+  customTools?: React.ReactNode | ((ui: unknown) => React.ReactNode);
   initialCaption?: string;
   t: (key: string) => string;
   fonts?: readonly string[];

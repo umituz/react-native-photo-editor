@@ -53,4 +53,4 @@ export const LayerDefaults = {
   },
 } as const;
 
-export type LayerDefaults = typeof LayerDefaults;
+export type LayerDefaultsType = typeof LayerDefaults;

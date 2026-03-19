@@ -11,7 +11,7 @@ import { Image } from "expo-image";
 import { AtomicText } from "@umituz/react-native-design-system/atoms";
 import { useAppDesignTokens, type DesignTokens } from "@umituz/react-native-design-system/theme";
 import { useTransformGesture } from "../../infrastructure/gesture/useTransformGesture";
-import type { Layer } from "../entities/Layer.entity".entity";
+import type { Layer } from "../../domain/entities/Layer.entity";
 
 interface DraggableLayerProps {
   layer: Layer;

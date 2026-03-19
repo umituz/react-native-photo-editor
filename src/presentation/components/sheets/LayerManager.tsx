@@ -7,7 +7,7 @@ import React, { memo } from "react";
 import { View, ScrollView, TouchableOpacity } from "react-native";
 import { AtomicText, AtomicIcon } from "@umituz/react-native-design-system/atoms";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
-import { Layer } from "../entities/Layer.entity"";
+import { Layer } from "../../../domain/entities/Layer.entity";
 
 interface LayerManagerProps {
   layers: Layer[];

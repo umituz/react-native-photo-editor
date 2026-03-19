@@ -4,8 +4,9 @@
  */
 
 import { useState, useCallback, useMemo } from "react";
-import { Layer, type TextLayerData } from "../entities/Layer.entity"";
-import { FiltersVO, FilterValues } from "../../domain/entities/Filters";
+import { Layer } from "../../domain/entities/Layer.entity";
+import type { TextContent as TextLayerData } from "../../domain/types";
+import { FilterSettings } from "../../domain/value-objects/FilterSettings.vo";
 import { HistoryService, HistoryState } from "../../domain/services/HistoryService";
 import { LayerService } from "../../domain/services/LayerService";
 import type { Transform } from "../../domain/entities/Transform";
@@ -19,7 +20,7 @@ export function useEditorStore() {
     historyService.createInitialState([])
   );
   const [activeLayerId, setActiveLayerId] = useState<string | null>(null);
-  const [filters, setFilters] = useState<FiltersVO>(FiltersVO.default());
+  const [filters, setFilters] = useState<FilterSettings>(FilterSettings.DEFAULT);
 
   // History actions
   const pushLayers = useCallback((layers: Layer[]) => {
@@ -35,11 +36,8 @@ export function useEditorStore() {
   }, []);
 
   // Layer actions
-  const addTextLayer = useCallback((overrides?: Partial<Omit<TextLayerData, "id" | "type">>) => {
-    const layer = layerService.createTextLayer({
-      ...overrides,
-      zIndex: history.present.length,
-    });
+  const addTextLayer = useCallback((overrides?: Partial<TextLayerData>) => {
+    const layer = layerService.createTextLayer(overrides || {});
     pushLayers([...history.present, layer]);
     setActiveLayerId(layer.id);
     return layer.id;
@@ -99,13 +97,29 @@ export function useEditorStore() {
   }, []);
 
   // Filter actions
-  const updateFilters = useCallback((updates: Partial<FilterValues>) => {
-    const current = filters.toJSON();
-    setFilters(FiltersVO.from({ ...current, ...updates }));
+  const updateFilters = useCallback((updates: Partial<{ brightness: number; contrast: number; saturation: number; sepia: number; grayscale: number; hueRotate?: number }>) => {
+    if (updates.brightness !== undefined) {
+      setFilters(filters.withBrightness(updates.brightness));
+    }
+    if (updates.contrast !== undefined) {
+      setFilters(filters.withContrast(updates.contrast));
+    }
+    if (updates.saturation !== undefined) {
+      setFilters(filters.withSaturation(updates.saturation));
+    }
+    if (updates.sepia !== undefined) {
+      setFilters(filters.withSepia(updates.sepia));
+    }
+    if (updates.grayscale !== undefined) {
+      setFilters(filters.withGrayscale(updates.grayscale));
+    }
+    if (updates.hueRotate !== undefined) {
+      setFilters(filters.withHueRotate(updates.hueRotate));
+    }
   }, [filters]);
 
   const resetFilters = useCallback(() => {
-    setFilters(FiltersVO.default());
+    setFilters(FilterSettings.DEFAULT);
   }, []);
 
   // Getters
@@ -122,7 +136,7 @@ export function useEditorStore() {
     layers,
     activeLayerId,
     activeLayer,
-    filters: filters.toJSON(),
+    filters,
     canUndo,
     canRedo,
 
