@@ -10,18 +10,18 @@ export { PhotoEditor } from "./PhotoEditor";
 export type { PhotoEditorProps } from "./PhotoEditor";
 
 // Domain entities
-export type { Layer, TextLayer, StickerLayer } from "./domain/entities/Layer";
+export type { Layer, TextLayer, StickerLayer } from "../entities/Layer.entity"";
 export type { Transform } from "./domain/entities/Transform";
 export type { FilterValues, FiltersVO } from "./domain/entities/Filters";
-export { isTextLayer, isStickerLayer } from "./domain/entities/Layer";
+export { isTextLayer, isStickerLayer } from "../entities/Layer.entity"";
 
 // Application hooks
 export { useEditor } from "./application/hooks/useEditor";
 export { useEditorUI } from "./application/hooks/useEditorUI";
 
 // Types & constants
-export type { LayerTransform } from "./infrastructure/gesture/types";
-export { DEFAULT_IMAGE_FILTERS } from "./domain/entities/Filters";
+export type { TransformGestureState, TransformGestureConfig } from "./infrastructure/gesture/types";
+export { DEFAULT_IMAGE_FILTERS } from "./types";
 export { DEFAULT_FONTS, DEFAULT_TEXT_COLORS, DEFAULT_STICKERS, DEFAULT_AI_STYLES } from "./constants";
 export type { FilterOption } from "./presentation/components/sheets/FilterSheet";
 

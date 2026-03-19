@@ -4,20 +4,20 @@
  */
 
 import React, { memo } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, type ViewStyle } from "react-native";
 import { Image } from "expo-image";
 import { DraggableLayer } from "./DraggableLayer";
-import { Layer } from "../../domain/entities/Layer";
-import type { FilterValues } from "../../domain/entities/Filters";
+import type { Layer } from "../entities/Layer.entity".entity";
+import type { FilterSettings } from "../../domain/value-objects/FilterSettings.vo";
 
 interface EditorCanvasProps {
   imageUrl: string;
   layers: Layer[];
   activeLayerId: string | null;
-  filters: FilterValues;
+  filters: FilterSettings;
   onLayerTap: (layerId: string) => void;
   onLayerTransform: (layerId: string, transform: { x: number; y: number; scale: number; rotation: number }) => void;
-  style?: any;
+  style?: ViewStyle;
 }
 
 export const EditorCanvas = memo<EditorCanvasProps>(({

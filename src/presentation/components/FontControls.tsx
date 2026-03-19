@@ -4,7 +4,7 @@
  */
 
 import React, { memo } from "react";
-import { View, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
+import { View, ScrollView, TouchableOpacity, StyleSheet, type ViewStyle } from "react-native";
 import { AtomicText } from "@umituz/react-native-design-system/atoms";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
 import { Slider } from "./ui/Slider";
@@ -23,7 +23,7 @@ interface FontControlsProps {
   fonts?: readonly string[];
   onFontSizeChange: (size: number) => void;
   onFontSelect: (font: string) => void;
-  style?: any;
+  style?: ViewStyle;
 }
 
 export const FontControls = memo<FontControlsProps>(({

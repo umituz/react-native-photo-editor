@@ -1,16 +1,27 @@
 /**
- * Transform Gesture Hook
- * Reusable gesture logic for draggable components
- * Eliminates ~180 lines of duplicate code
+ * Transform Gesture Utility
+ * Reusable gesture logic for draggable layers
  */
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Gesture } from "react-native-gesture-handler";
-import type { Transform } from "../../domain/entities/Transform";
-import type { TransformGestureConfig, TransformGestureState } from "./types";
+import type { Layer } from "../entities/Layer.entity".entity";
+
+export interface TransformGestureState {
+  position: { x: number; y: number };
+  scale: number;
+  rotation: number;
+}
+
+export interface TransformGestureConfig {
+  minScale?: number;
+  maxScale?: number;
+  onTransformEnd: (transform: { x: number; y: number; scale: number; rotation: number }) => void;
+  onPress?: () => void;
+}
 
 export function useTransformGesture(
-  initialTransform: Partial<Transform>,
+  initialTransform: Pick<Layer, "position" | "rotation" | "scale">,
   config: TransformGestureConfig
 ) {
   const {
@@ -20,37 +31,36 @@ export function useTransformGesture(
     onPress,
   } = config;
 
-  // State
   const [state, setState] = useState<TransformGestureState>(() => ({
-    position: { x: initialTransform.x ?? 50, y: initialTransform.y ?? 50 },
-    scale: initialTransform.scale ?? 1,
-    rotation: initialTransform.rotation ?? 0,
+    position: { x: initialTransform.position.x, y: initialTransform.position.y },
+    scale: initialTransform.scale,
+    rotation: initialTransform.rotation,
   }));
 
-  // Sync state when props change (undo/redo)
-  useEffect(() => {
-    setState((prev: TransformGestureState) => ({
-      ...prev,
-      position: { x: initialTransform.x ?? prev.position.x, y: initialTransform.y ?? prev.position.y },
-      scale: initialTransform.scale ?? prev.scale,
-      rotation: initialTransform.rotation ?? prev.rotation,
-    }));
-  }, [initialTransform.x, initialTransform.y, initialTransform.scale, initialTransform.rotation]);
-
-  // Refs for gesture callbacks
   const stateRef = useRef(state);
   stateRef.current = state;
+
   const onTransformEndRef = useRef(onTransformEnd);
   onTransformEndRef.current = onTransformEnd;
   const onPressRef = useRef(onPress);
   onPressRef.current = onPress;
 
-  // Start values for gestures
   const offsetRef = useRef(state.position);
   const scaleStartRef = useRef(state.scale);
   const rotationStartRef = useRef(state.rotation);
 
-  // Emit transform
+  useEffect(() => {
+    setState((prev) => ({
+      ...prev,
+      position: {
+        x: initialTransform.position.x ?? prev.position.x,
+        y: initialTransform.position.y ?? prev.position.y,
+      },
+      scale: initialTransform.scale ?? prev.scale,
+      rotation: initialTransform.rotation ?? prev.rotation,
+    }));
+  }, [initialTransform.position.x, initialTransform.position.y, initialTransform.scale, initialTransform.rotation]);
+
   const emitTransform = useCallback(() => {
     onTransformEndRef.current({
       x: stateRef.current.position.x,
@@ -60,7 +70,6 @@ export function useTransformGesture(
     });
   }, []);
 
-  // Pan gesture
   const panGesture = Gesture.Pan()
     .runOnJS(true)
     .averageTouches(true)
@@ -68,63 +77,51 @@ export function useTransformGesture(
       offsetRef.current = stateRef.current.position;
     })
     .onUpdate((e: { translationX: number; translationY: number }) => {
-      setState((prev: TransformGestureState) => ({
-        ...prev,
+      setState({
+        ...stateRef.current,
         position: {
           x: offsetRef.current.x + e.translationX,
           y: offsetRef.current.y + e.translationY,
         },
-      }));
+      });
     })
     .onEnd(emitTransform);
 
-  // Pinch gesture
   const pinchGesture = Gesture.Pinch()
     .runOnJS(true)
     .onStart(() => {
       scaleStartRef.current = stateRef.current.scale;
     })
     .onUpdate((e: { scale: number }) => {
-      setState((prev: TransformGestureState) => ({
-        ...prev,
+      setState({
+        ...stateRef.current,
         scale: Math.max(minScale, Math.min(maxScale, scaleStartRef.current * e.scale)),
-      }));
+      });
     })
     .onEnd(emitTransform);
 
-  // Rotation gesture
   const rotationGesture = Gesture.Rotation()
     .runOnJS(true)
     .onStart(() => {
       rotationStartRef.current = stateRef.current.rotation;
     })
     .onUpdate((e: { rotation: number }) => {
-      setState((prev: TransformGestureState) => ({
-        ...prev,
+      setState({
+        ...stateRef.current,
         rotation: rotationStartRef.current + (e.rotation * 180) / Math.PI,
-      }));
+      });
     })
     .onEnd(emitTransform);
 
-  // Tap gesture
   const tapGesture = Gesture.Tap()
     .runOnJS(true)
     .onEnd(() => onPressRef.current?.());
 
-  // Composed gesture
   const composed = Gesture.Exclusive(
     Gesture.Simultaneous(panGesture, pinchGesture, rotationGesture),
-    tapGesture,
+    tapGesture
   );
 
-  return {
-    state,
-    gestures: {
-      pan: panGesture,
-      pinch: pinchGesture,
-      rotation: rotationGesture,
-      tap: tapGesture,
-      composed,
-    },
-  };
+  return { state, gestures: { pan: panGesture, pinch: pinchGesture, rotation: rotationGesture, tap: tapGesture, composed } };
 }
+

@@ -7,7 +7,7 @@ import React, { memo } from "react";
 import { View, ScrollView, TouchableOpacity } from "react-native";
 import { AtomicText, AtomicIcon } from "@umituz/react-native-design-system/atoms";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
-import { Layer, isTextLayer } from "../../../domain/entities/Layer";
+import { Layer } from "../entities/Layer.entity"";
 
 interface LayerManagerProps {
   layers: Layer[];
@@ -47,7 +47,7 @@ export const LayerManager = memo<LayerManagerProps>(({
         ) : (
           sortedLayers.map((layer, idx) => {
             const isActive = activeLayerId === layer.id;
-            const label = isTextLayer(layer)
+            const label = layer.isText()
               ? layer.text || t("photo_editor.untitled") || "Untitled"
               : "Sticker";
             const isTop = idx === 0;
@@ -60,12 +60,11 @@ export const LayerManager = memo<LayerManagerProps>(({
                   flexDirection: "row",
                   alignItems: "center",
                   padding: tokens.spacing.sm,
-                  backgroundColor: tokens.colors.surfaceVariant,
+                  backgroundColor: isActive ? tokens.colors.primary + "10" : tokens.colors.surfaceVariant,
                   borderRadius: tokens.borders.radius.md,
                   marginBottom: tokens.spacing.xs,
                   borderWidth: 2,
                   borderColor: isActive ? tokens.colors.primary : "transparent",
-                  backgroundColor: isActive ? tokens.colors.primary + "10" : tokens.colors.surfaceVariant,
                 }}
                 onPress={() => onSelectLayer(layer.id)}
                 accessibilityLabel={`${layer.type} layer: ${label}`}

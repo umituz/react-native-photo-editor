@@ -7,7 +7,8 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import type { BottomSheetModalRef } from "@umituz/react-native-design-system/molecules";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
 import { useEditor } from "./useEditor";
-import type { TextAlign } from "../../domain/entities/Layer";
+import type { TextAlign } from "../entities/Layer.entity"";
+import type { Transform } from "../../domain/entities/Transform";
 
 export function useEditorUI(initialCaption?: string) {
   const tokens = useAppDesignTokens();
@@ -50,8 +51,8 @@ export function useEditorUI(initialCaption?: string) {
   // Handle text layer tap
   const handleTextLayerTap = useCallback((layerId: string) => {
     editor.selectLayer(layerId);
-    const layer = editor.layers.find(l => l.id === layerId);
-    if (layer?.type === "text") {
+    const layer = editor.layers.find((l: { id: string }) => l.id === layerId);
+    if (layer && layer.isText()) {
       setEditingText(layer.text ?? "");
       setFontSize(layer.fontSize ?? 48);
       setEditingColor(layer.color ?? tokens.colors.textPrimary);
@@ -64,8 +65,8 @@ export function useEditorUI(initialCaption?: string) {
 
   // Handle save text
   const handleSaveText = useCallback(() => {
-    if (editor.activeLayerId) {
-      editor.updateLayer(editor.activeLayerId, {
+    if (editor.activeLayerId && editor.activeLayer?.isText()) {
+      editor.updateTextLayerContent(editor.activeLayerId, {
         text: editingText,
         fontSize,
         fontFamily: selectedFont,
@@ -143,3 +144,5 @@ export function useEditorUI(initialCaption?: string) {
     handleLayerTransform,
   };
 }
+
+export type EditorUIState = ReturnType<typeof useEditorUI>;

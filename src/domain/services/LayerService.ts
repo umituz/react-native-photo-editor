@@ -3,7 +3,7 @@
  * Business logic for layer operations
  */
 
-import { Layer, TextLayer, StickerLayer, isTextLayer } from "../entities/Layer";
+import { Layer, TextLayer, StickerLayer, type TextLayerData, type StickerLayerData } from "../entities/Layer.entity"";
 import type { Transform } from "../entities/Transform";
 
 export class LayerService {

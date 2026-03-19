@@ -41,7 +41,7 @@ export interface StickerLayerData extends BaseLayerData {
 export type LayerData = TextLayerData | StickerLayerData;
 
 export class Layer {
-  constructor(private readonly data: LayerData) {}
+  constructor(protected readonly data: LayerData) {}
 
   get id(): string { return this.data.id; }
   get type(): LayerType { return this.data.type; }
@@ -87,7 +87,7 @@ export class Layer {
 }
 
 export class TextLayer extends Layer {
-  declare readonly data: TextLayerData;
+  declare protected readonly data: TextLayerData;
 
   get text(): string { return this.data.text; }
   get fontSize(): number { return this.data.fontSize; }
@@ -108,7 +108,7 @@ export class TextLayer extends Layer {
 }
 
 export class StickerLayer extends Layer {
-  declare readonly data: StickerLayerData;
+  declare protected readonly data: StickerLayerData;
 
   get uri(): string { return this.data.uri; }
 

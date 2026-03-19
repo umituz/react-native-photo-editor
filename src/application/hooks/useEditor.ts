@@ -5,10 +5,6 @@
 
 import { useMemo } from "react";
 import { useEditorStore } from "../stores/EditorStore";
-import { Layer } from "../../domain/entities/Layer";
-import type { TextLayerData } from "../../domain/entities/Layer";
-import type { Transform } from "../../domain/entities/Transform";
-import type { FilterValues } from "../../domain/entities/Filters";
 
 export function useEditor() {
   const store = useEditorStore();
@@ -30,6 +26,7 @@ export function useEditor() {
     addTextLayer: store.addTextLayer,
     addStickerLayer: store.addStickerLayer,
     updateLayer: store.updateLayer,
+    updateTextLayerContent: store.updateTextLayerContent,
     deleteLayer: store.deleteLayer,
     duplicateLayer: store.duplicateLayer,
     moveLayerUp: store.moveLayerUp,
@@ -51,6 +48,7 @@ export function useEditor() {
     store.addTextLayer,
     store.addStickerLayer,
     store.updateLayer,
+    store.updateTextLayerContent,
     store.deleteLayer,
     store.duplicateLayer,
     store.moveLayerUp,
@@ -61,7 +59,7 @@ export function useEditor() {
   ]);
 }
 
-export type { Layer } from "../../domain/entities/Layer";
+export type { Layer } from "../entities/Layer.entity"";
 export type { Transform } from "../../domain/entities/Transform";
 export type { FilterValues } from "../../domain/entities/Filters";
-export type { TextLayerData } from "../../domain/entities/Layer";
+export type { TextLayerData } from "../entities/Layer.entity"";

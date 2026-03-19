@@ -8,7 +8,7 @@ import { View, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import { AtomicText, AtomicButton } from "@umituz/react-native-design-system/atoms";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
 import { ColorPicker } from "../ui/ColorPicker";
-import type { TextAlign } from "../../../domain/entities/Layer";
+import type { TextAlign } from "../entities/Layer.entity"";
 
 interface TextEditorSheetProps {
   value: string;

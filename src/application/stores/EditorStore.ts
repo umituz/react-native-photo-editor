@@ -4,8 +4,8 @@
  */
 
 import { useState, useCallback, useMemo } from "react";
-import { Layer, TextLayer, StickerLayer } from "../../domain/entities/Layer";
-import { FiltersVO, FilterValues, DEFAULT_FILTERS } from "../../domain/entities/Filters";
+import { Layer, type TextLayerData } from "../entities/Layer.entity"";
+import { FiltersVO, FilterValues } from "../../domain/entities/Filters";
 import { HistoryService, HistoryState } from "../../domain/services/HistoryService";
 import { LayerService } from "../../domain/services/LayerService";
 import type { Transform } from "../../domain/entities/Transform";
@@ -23,15 +23,15 @@ export function useEditorStore() {
 
   // History actions
   const pushLayers = useCallback((layers: Layer[]) => {
-    setHistory((prev) => historyService.push(prev, layers));
+    setHistory((prev: HistoryState<Layer[]>) => historyService.push(prev, layers));
   }, []);
 
   const undo = useCallback(() => {
-    setHistory((prev) => historyService.undo(prev));
+    setHistory((prev: HistoryState<Layer[]>) => historyService.undo(prev));
   }, []);
 
   const redo = useCallback(() => {
-    setHistory((prev) => historyService.redo(prev));
+    setHistory((prev: HistoryState<Layer[]>) => historyService.redo(prev));
   }, []);
 
   // Layer actions
@@ -56,6 +56,16 @@ export function useEditorStore() {
 
   const updateLayer = useCallback((id: string, updates: Partial<Transform>) => {
     const layers = layerService.updateLayer(history.present, id, updates);
+    pushLayers(layers);
+  }, [history.present, pushLayers]);
+
+  const updateTextLayerContent = useCallback((id: string, updates: Partial<Omit<TextLayerData, "id" | "type">>) => {
+    const layers = history.present.map(layer => {
+      if (layer.id === id && layer.isText()) {
+        return layer.withStyle(updates);
+      }
+      return layer;
+    });
     pushLayers(layers);
   }, [history.present, pushLayers]);
 
@@ -101,7 +111,7 @@ export function useEditorStore() {
   // Getters
   const layers = useMemo(() => layerService.sortByZIndex(history.present), [history.present]);
   const activeLayer = useMemo(() =>
-    history.present.find(l => l.id === activeLayerId) ?? null,
+    history.present.find((l: Layer) => l.id === activeLayerId) ?? null,
   [history.present, activeLayerId]
   );
   const canUndo = useMemo(() => historyService.canUndo(history), [history]);
@@ -124,6 +134,7 @@ export function useEditorStore() {
     addTextLayer,
     addStickerLayer,
     updateLayer,
+    updateTextLayerContent,
     deleteLayer,
     duplicateLayer,
     moveLayerUp,

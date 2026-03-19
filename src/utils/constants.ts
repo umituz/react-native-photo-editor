@@ -1,0 +1,84 @@
+/**
+ * Constants Utility
+ * Shared constants for the editor
+ */
+
+export const DEFAULT_COLORS = [
+  "#FFFFFF", "#000000", "#888888", "#CCCCCC",
+  "#FF3B30", "#FF9500", "#FFCC00", "#FF2D55",
+  "#34C759", "#30B0C7", "#007AFF", "#5AC8FA",
+  "#5856D6", "#AF52DE", "#FF6B6B", "#FFD93D",
+  "#6BCB77", "#4D96FF", "#C77DFF", "#F72585",
+] as const;
+
+export const DEFAULT_FONTS = [
+  "System",
+  "Impact",
+  "Comic",
+  "Serif",
+  "Retro",
+] as const;
+
+export const DEFAULT_STICKERS = [
+  "😀", "😂", "🤣", "😍", "🥰", "😎", "🤯", "🥳", "😤", "💀",
+  "🔥", "❤️", "💯", "✨", "🎉", "🤡", "👀", "🙌", "👏", "💪",
+  "🤝", "🙈", "🐶", "🐱", "🦊", "🐸", "🌟", "⭐", "🌈", "☀️",
+  "🌙", "💫",
+] as const;
+
+export const AI_STYLES = [
+  { id: "viral", label: "✨ Viral", desc: "Catchy & shareable" },
+  { id: "funny", label: "😂 Funny", desc: "Humor that connects" },
+  { id: "savage", label: "🔥 Savage", desc: "Bold & edgy" },
+  { id: "wholesome", label: "💕 Wholesome", desc: "Warm & positive" },
+  { id: "sarcastic", label: "😏 Sarcastic", desc: "Witty & ironic" },
+  { id: "relatable", label: "🎯 Relatable", desc: "Everyone gets it" },
+] as const;
+
+export const FILTER_PRESETS = [
+  {
+    id: "none",
+    name: "None",
+    icon: "close",
+    filters: { brightness: 1, contrast: 1, saturation: 1, sepia: 0, grayscale: 0 },
+  },
+  {
+    id: "sepia",
+    name: "Sepia",
+    icon: "brush",
+    filters: { sepia: 0.7, saturation: 0.8 },
+  },
+  {
+    id: "grayscale",
+    name: "B&W",
+    icon: "swap-horizontal",
+    filters: { grayscale: 1, saturation: 0 },
+  },
+  {
+    id: "vintage",
+    name: "Vintage",
+    icon: "flash",
+    filters: { sepia: 0.3, contrast: 1.1, brightness: 0.9 },
+  },
+  {
+    id: "warm",
+    name: "Warm",
+    icon: "sparkles",
+    filters: { brightness: 1.05, saturation: 1.2 },
+  },
+  {
+    id: "cool",
+    name: "Cool",
+    icon: "image",
+    filters: { contrast: 1.05, brightness: 1.02, saturation: 0.85 },
+  },
+] as const;
+
+export const SLIDER_CONFIGS = {
+  brightness: { min: 0.5, max: 2, step: 0.05, default: 1 },
+  contrast: { min: 0.5, max: 2, step: 0.05, default: 1 },
+  saturation: { min: 0, max: 2, step: 0.05, default: 1 },
+  hueRotate: { min: 0, max: 360, step: 1, default: 0 },
+  sepia: { min: 0, max: 1, step: 0.05, default: 0 },
+  grayscale: { min: 0, max: 1, step: 0.05, default: 0 },
+} as const;

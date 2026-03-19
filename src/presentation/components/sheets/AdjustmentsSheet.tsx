@@ -8,11 +8,11 @@ import { View, TouchableOpacity } from "react-native";
 import { AtomicText, AtomicIcon } from "@umituz/react-native-design-system/atoms";
 import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
 import { Slider } from "../ui/Slider";
-import { DEFAULT_FILTERS } from "../../../domain/entities/Filters";
+import { DEFAULT_FILTERS, type FilterValues } from "../../../domain/entities/Filters";
 
 interface AdjustmentsSheetProps {
-  filters: Record<string, number>;
-  onFiltersChange: (filters: Record<string, number>) => void;
+  filters: FilterValues;
+  onFiltersChange: (filters: FilterValues) => void;
 }
 
 export const AdjustmentsSheet = memo<AdjustmentsSheetProps>(({
@@ -21,7 +21,7 @@ export const AdjustmentsSheet = memo<AdjustmentsSheetProps>(({
 }) => {
   const tokens = useAppDesignTokens();
 
-  const update = (key: string, val: number) => {
+  const update = (key: keyof FilterValues, val: number) => {
     onFiltersChange({ ...filters, [key]: val });
   };
 

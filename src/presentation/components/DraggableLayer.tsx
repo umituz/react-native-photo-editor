@@ -5,13 +5,13 @@
  */
 
 import React, { memo } from "react";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
 import { Image } from "expo-image";
-import { AtomicText, AtomicIcon } from "@umituz/react-native-design-system/atoms";
-import { useAppDesignTokens } from "@umituz/react-native-design-system/theme";
+import { AtomicText } from "@umituz/react-native-design-system/atoms";
+import { useAppDesignTokens, type DesignTokens } from "@umituz/react-native-design-system/theme";
 import { useTransformGesture } from "../../infrastructure/gesture/useTransformGesture";
-import { Layer, isTextLayer, isStickerLayer } from "../../domain/entities/Layer";
+import type { Layer } from "../entities/Layer.entity".entity";
 
 interface DraggableLayerProps {
   layer: Layer;
@@ -30,15 +30,15 @@ export const DraggableLayer = memo<DraggableLayerProps>(({
   onTransformEnd,
 }) => {
   const tokens = useAppDesignTokens();
-  const { state, gestures } = useTransformGesture(layer, {
-    onTransformEnd,
-    onPress,
-  });
+  const { state, gestures } = useTransformGesture(
+    { x: layer.x, y: layer.y, scale: layer.scale, rotation: layer.rotation },
+    { onTransformEnd, onPress }
+  );
 
   return (
     <GestureDetector gesture={gestures.composed}>
       <View
-        accessibilityLabel={isTextLayer(layer) ? layer.text || "Text layer" : "Sticker layer"}
+        accessibilityLabel={layer.isText() ? layer.text || "Text layer" : "Sticker layer"}
         accessibilityRole="button"
         style={[
           styles.container,
@@ -63,12 +63,12 @@ export const DraggableLayer = memo<DraggableLayerProps>(({
             borderStyle: "dashed",
             backgroundColor: isSelected
               ? tokens.colors.primary + "10"
-              : isTextLayer(layer)
+              : layer.isText()
                 ? layer.backgroundColor
                 : "transparent",
           }}
         >
-          {isTextLayer(layer) ? (
+          {layer.isText() ? (
             <AtomicText
               style={{
                 fontSize: layer.fontSize,
@@ -81,7 +81,7 @@ export const DraggableLayer = memo<DraggableLayerProps>(({
             >
               {layer.text || "TAP TO EDIT"}
             </AtomicText>
-          ) : isStickerLayer(layer) ? (
+          ) : layer.isSticker() ? (
             renderStickerContent(layer.uri, tokens)
           ) : null}
         </View>
@@ -92,7 +92,7 @@ export const DraggableLayer = memo<DraggableLayerProps>(({
 
 DraggableLayer.displayName = "DraggableLayer";
 
-function renderStickerContent(uri: string, tokens: any) {
+function renderStickerContent(uri: string, _tokens: DesignTokens) {
   const isEmoji = isEmojiString(uri);
 
   if (isEmoji) {

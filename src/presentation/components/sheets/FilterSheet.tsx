@@ -21,7 +21,7 @@ interface FilterSheetProps {
   filters?: FilterOption[];
 }
 
-const DEFAULT_FILTERS: FilterOption[] = [
+export const DEFAULT_FILTERS: FilterOption[] = [
   {
     id: "none",
     name: "None",
