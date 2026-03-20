@@ -44,10 +44,12 @@ export function useEditorStore() {
   }, [history.present, pushLayers]);
 
   const addStickerLayer = useCallback((uri: string) => {
-    const layer = layerService.createStickerLayer(uri, {
+    const layer = layerService.createStickerLayer(uri);
+    // Set zIndex manually based on current layer count
+    const layersWithZIndex = layerService.updateLayer([...history.present, layer], layer.id, {
       zIndex: history.present.length,
-    });
-    pushLayers([...history.present, layer]);
+    } as Partial<Transform>);
+    pushLayers(layersWithZIndex);
     setActiveLayerId(layer.id);
     return layer.id;
   }, [history.present, pushLayers]);
